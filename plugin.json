@@ -1,10 +1,16 @@
 {
-  "name": "Example Plugin",
+  "name": "Ryzenadj",
   "author": "John Doe",
-  "flags": ["debug", "_root"],
+  "flags": [
+    "debug",
+    "_root"
+  ],
   "publish": {
-    "tags": ["template", "root"],
-    "description": "Decky example plugin.",
+    "tags": [
+      "template",
+      "root"
+    ],
+    "description": "Ryzenadj UI",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }
