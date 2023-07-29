@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 # The decky plugin module is located at decky-loader/plugin
 # For easy intellisense checkout the decky-loader code one directory up
@@ -13,7 +13,10 @@ class Plugin:
             cpu_offset = -cpu_offset
         if gpu_offset > 0:
             gpu_offset = -gpu_offset
-        return f"Offsets updated: CPU: {cpu_offset}, GPU: {gpu_offset}"
+
+        ra = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
+
+        return f"Offsets updated: CPU: {cpu_offset}, GPU: {gpu_offset}, RyzenAdj found: {ra.exists()}"
 
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
