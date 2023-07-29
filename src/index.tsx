@@ -10,7 +10,7 @@ import {
   staticClasses,
 } from "decky-frontend-lib";
 import { useEffect, useState, VFC, StrictMode } from "react";
-import { FaShip } from "react-icons/fa";
+import { FaBolt } from "react-icons/fa";
 
 interface UpdateOffsetsMethodArgs {
   cpu_offset: number;
@@ -118,7 +118,7 @@ export default definePlugin((serverApi: ServerAPI) => {
       <StrictMode>
         <RyzenAdjContent serverAPI={serverApi} />
       </StrictMode>,
-    icon: <FaShip />,
+    icon: <FaBolt />,
     onDismount() {
       serverApi.routerHook.removeRoute("/decky-plugin-test");
     },
