@@ -38,14 +38,18 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   return (
     <PanelSection title="Panel Section">
       <PanelSectionRow>
-        <SliderField value={CPUOffset} min={0} max={30} step={1} showValue={true} validValues={"range"}
+        <SliderField
+          label="CPU Offset" showValue={true}
+          value={CPUOffset} min={0} max={30} step={1} validValues={"range"}
           onChange={(newValue) => {
             setCPUOffset(newValue);
             onOffsetUpdate();
           }} />
       </PanelSectionRow>
       <PanelSectionRow>
-        <SliderField value={GPUOffset} min={0} max={30} step={1} showValue={true} validValues={"range"}
+        <SliderField
+          label="GPU Offset" showValue={true}
+          value={GPUOffset} min={0} max={30} step={1} validValues={"range"}
           onChange={(newValue) => {
             setGPUOffset(newValue);
             onOffsetUpdate();
