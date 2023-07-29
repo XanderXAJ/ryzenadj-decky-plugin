@@ -3,7 +3,7 @@
   "author": "XanderXAJ",
   "flags": [
     "debug",
-    "_root"
+    "root"
   ],
   "publish": {
     "tags": [
