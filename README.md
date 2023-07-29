@@ -4,7 +4,23 @@ Reference example for using [decky-frontend-lib](https://github.com/SteamDeckHom
 
 ### **Please also refer to the [wiki](https://wiki.deckbrew.xyz/en/user-guide/home#plugin-development) for important information on plugin development and submissions/updates. currently documentation is split between this README and the wiki which is something we are hoping to rectify in the future.**  
 
-## Developers
+## Development
+
+### Debugging using CEF debugging
+
+[Follow these instructions.](https://docs.deckthemes.com/CSSLoader/Cef_Debugger/)
+
+### Debugging using React DevTools
+
+Run [the standalone version of React DevTools](https://github.com/facebook/react/tree/main/packages/react-devtools), e.g.:
+
+```shell
+npx react-devtools
+```
+
+Then enter your machine's IP address (helpfully displayed by React DevTools) in to Decky Loader's developer settings.
+
+Note: _enter only the IP address_ -- don't be smart like me and also enter the port number or protocol.
 
 ### Dependencies
 
