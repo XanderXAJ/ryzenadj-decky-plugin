@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 
 # The decky plugin module is located at decky-loader/plugin
 # For easy intellisense checkout the decky-loader code one directory up
@@ -19,9 +20,14 @@ class Plugin:
 
         cpu_value = hex(BASE_CPU + cpu_offset)
         gpu_value = hex(BASE_GPU + gpu_offset)
-        ra = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
 
-        return f"Offsets updated: CPU: {cpu_value} ({cpu_offset}), GPU: {gpu_value} ({gpu_offset}), RyzenAdj found: {ra.exists()}"
+        ra_path = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
+        ra_result = subprocess.run(
+            [str(ra_path), f"--set-coall={cpu_value}", f"--set-cogfx={gpu_value}"],
+            capture_output=True,
+        )
+
+        return f"Offsets updated: CPU: {cpu_value} ({cpu_offset}), GPU: {gpu_value} ({gpu_offset}), result: {str(ra_result)}"
 
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):

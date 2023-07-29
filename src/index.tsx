@@ -23,12 +23,12 @@ const DEFAULT_GPU_OFFSET = 0;
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState(DEFAULT_CPU_OFFSET);
   const [GPUOffset, setGPUOffset] = useState(DEFAULT_GPU_OFFSET);
-  const [result, setResult] = useState(0);
+  const [result, setResult] = useState("");
   const [debug, setDebug] = useState<string>("");
 
   useEffect(() => {
     const updateOffset = async () => {
-      const result = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, number>(
+      const result = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, string>(
         "update_offsets",
         {
           cpu_offset: CPUOffset,
@@ -36,9 +36,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
         }
       );
       console.log("Result:", result);
-      if (result.success) {
-        setResult(result.result);
-      }
+      setResult(result.result);
     }
 
     updateOffset();
