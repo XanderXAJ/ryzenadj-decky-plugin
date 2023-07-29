@@ -9,7 +9,7 @@ import {
   SliderField,
   staticClasses,
 } from "decky-frontend-lib";
-import { useState, VFC, StrictMode } from "react";
+import { useEffect, useState, VFC, StrictMode } from "react";
 import { FaShip } from "react-icons/fa";
 
 interface AddMethodArgs {
@@ -23,18 +23,23 @@ const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [result, setResult] = useState(0);
   const [debug, setDebug] = useState<string>("");
 
-  const onOffsetUpdate = async () => {
-    const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
-      "add",
-      {
-        left: CPUOffset,
-        right: GPUOffset,
+  useEffect(() => {
+    const updateOffset = async () => {
+      const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
+        "add",
+        {
+          left: CPUOffset,
+          right: GPUOffset,
+        }
+      );
+      console.log("Result:", result);
+      if (result.success) {
+        setResult(result.result);
       }
-    );
-    if (result.success) {
-      setResult(result.result);
     }
-  };
+
+    updateOffset();
+  }, [CPUOffset, GPUOffset]);
 
   return (
     <PanelSection title="Panel Section">
@@ -46,7 +51,6 @@ const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
             console.log(`CPU Offset: ${newValue}`)
             setDebug(`CPU Offset: ${newValue}`);
             setCPUOffset(newValue);
-            onOffsetUpdate();
           }} />
       </PanelSectionRow>
       <PanelSectionRow>
@@ -57,7 +61,6 @@ const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
             console.log(`GPU Offset: ${newValue}`)
             setDebug(`GPU Offset: ${newValue}`);
             setGPUOffset(newValue);
-            onOffsetUpdate();
           }} />
       </PanelSectionRow>
       <PanelSectionRow>
