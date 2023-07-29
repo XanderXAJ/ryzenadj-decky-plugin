@@ -2,72 +2,58 @@ import {
   ButtonItem,
   definePlugin,
   DialogButton,
-  Menu,
-  MenuItem,
   PanelSection,
   PanelSectionRow,
   Router,
   ServerAPI,
-  showContextMenu,
   SliderField,
   staticClasses,
 } from "decky-frontend-lib";
-import { VFC } from "react";
+import { useState, VFC } from "react";
 import { FaShip } from "react-icons/fa";
 
-import logo from "../assets/logo.png";
+interface AddMethodArgs {
+  left: number;
+  right: number;
+}
 
-// interface AddMethodArgs {
-//   left: number;
-//   right: number;
-// }
+const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
+  const [CPUOffset, setCPUOffset] = useState(0);
+  const [GPUOffset, setGPUOffset] = useState(0);
+  const [result, setResult] = useState(0);
 
-const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
-  // const [result, setResult] = useState<number | undefined>();
-
-  // const onClick = async () => {
-  //   const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
-  //     "add",
-  //     {
-  //       left: 2,
-  //       right: 2,
-  //     }
-  //   );
-  //   if (result.success) {
-  //     setResult(result.result);
-  //   }
-  // };
+  const onOffsetUpdate = async () => {
+    const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
+      "add",
+      {
+        left: CPUOffset,
+        right: GPUOffset,
+      }
+    );
+    if (result.success) {
+      setResult(result.result);
+    }
+  };
 
   return (
     <PanelSection title="Panel Section">
       <PanelSectionRow>
-        <SliderField value={0} min={-30} max={0} step={1} showValue={true} validValues={"range"} />
-        <SliderField value={0} min={-30} max={0} step={1} showValue={true} validValues={"range"} />
+        <SliderField value={CPUOffset} min={0} max={30} step={1} showValue={true} validValues={"range"}
+          onChange={(newValue) => {
+            setCPUOffset(newValue);
+            onOffsetUpdate();
+          }} />
       </PanelSectionRow>
       <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={(e: any) =>
-            showContextMenu(
-              <Menu label="Menu" cancelText="CAAAANCEL" onCancel={() => { }}>
-                <MenuItem onSelected={() => { }}>Item #1</MenuItem>
-                <MenuItem onSelected={() => { }}>Item #2</MenuItem>
-                <MenuItem onSelected={() => { }}>Item #3</MenuItem>
-              </Menu>,
-              e.currentTarget ?? window
-            )
-          }
-        >
-          Server says yolo
-        </ButtonItem>
+        <SliderField value={GPUOffset} min={0} max={30} step={1} showValue={true} validValues={"range"}
+          onChange={(newValue) => {
+            setGPUOffset(newValue);
+            onOffsetUpdate();
+          }} />
       </PanelSectionRow>
-
       <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} />
-        </div>
+        Result: {result}
       </PanelSectionRow>
-
       <PanelSectionRow>
         <ButtonItem
           layout="below"
