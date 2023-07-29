@@ -47,7 +47,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
       <PanelSectionRow>
         <SliderField
           label="CPU Offset" showValue={true}
-          value={CPUOffset} min={0} max={30} step={1} validValues="range" resetValue={0}
+          value={CPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={0}
           onChange={(newValue) => {
             console.log(`CPU Offset: ${newValue}`)
             setDebug(`CPU Offset: ${newValue}`);
@@ -57,7 +57,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
       <PanelSectionRow>
         <SliderField
           label="GPU Offset" showValue={true}
-          value={GPUOffset} min={0} max={30} step={1} validValues="range" resetValue={0}
+          value={GPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={0}
           onChange={(newValue) => {
             console.log(`GPU Offset: ${newValue}`)
             setDebug(`GPU Offset: ${newValue}`);
