@@ -118,7 +118,10 @@
             "label": "builddeploy",
             "detail": "Builds plugin and deploys to deck",
             "dependsOrder": "sequence",
-            "group": "none",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "dependsOn": [
                 "build",
                 "deploy"
