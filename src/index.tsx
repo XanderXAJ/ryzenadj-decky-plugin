@@ -9,7 +9,7 @@ import {
   SliderField,
   staticClasses,
 } from "decky-frontend-lib";
-import { useState, VFC } from "react";
+import { useState, VFC, StrictMode } from "react";
 import { FaShip } from "react-icons/fa";
 
 interface AddMethodArgs {
@@ -100,7 +100,9 @@ export default definePlugin((serverApi: ServerAPI) => {
   return {
     title: <div className={staticClasses.Title}>Ryzenadj</div>,
     content:
+      <StrictMode>
         <RyzenadjContent serverAPI={serverApi} />
+      </StrictMode>,
     icon: <FaShip />,
     onDismount() {
       serverApi.routerHook.removeRoute("/decky-plugin-test");
