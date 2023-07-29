@@ -22,16 +22,16 @@ class Plugin:
         gpu_value = hex(BASE_GPU + gpu_offset)
 
         ra_path = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
-        ra_result = subprocess.run(
-            [str(ra_path), f"--set-coall={cpu_value}", f"--set-cogfx={gpu_value}"],
-            capture_output=True,
-        )
+        ra_cmd = [str(ra_path), f"--set-coall={cpu_value}", f"--set-cogfx={gpu_value}"]
+        ra_result = subprocess.run(ra_cmd, capture_output=True)
 
         result = {
             "cpu_offset": cpu_offset,
             "cpu_value": cpu_value,
             "gpu_offset": gpu_offset,
             "gpu_value": gpu_value,
+            "ryzenadj_cmd": " ".join(ra_cmd),
+            "ryzenadj_stderr": ra_result.stderr.decode(),
             "ryzenadj_stdout": ra_result.stdout.decode(),
         }
         decky_plugin.logger.info("Result: %s", result)
