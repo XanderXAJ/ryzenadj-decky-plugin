@@ -21,6 +21,7 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState(0);
   const [GPUOffset, setGPUOffset] = useState(0);
   const [result, setResult] = useState(0);
+  const [debug, setDebug] = useState<string>("");
 
   const onOffsetUpdate = async () => {
     const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
@@ -42,6 +43,8 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
           label="CPU Offset" showValue={true}
           value={CPUOffset} min={0} max={30} step={1} validValues={"range"}
           onChange={(newValue) => {
+            console.log(`CPU Offset: ${newValue}`)
+            setDebug(`CPU Offset: ${newValue}`);
             setCPUOffset(newValue);
             onOffsetUpdate();
           }} />
@@ -51,12 +54,17 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
           label="GPU Offset" showValue={true}
           value={GPUOffset} min={0} max={30} step={1} validValues={"range"}
           onChange={(newValue) => {
+            console.log(`GPU Offset: ${newValue}`)
+            setDebug(`GPU Offset: ${newValue}`);
             setGPUOffset(newValue);
             onOffsetUpdate();
           }} />
       </PanelSectionRow>
       <PanelSectionRow>
         Result: {result}
+      </PanelSectionRow>
+      <PanelSectionRow>
+        Debug: {debug}
       </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem
