@@ -27,7 +27,15 @@ class Plugin:
             capture_output=True,
         )
 
-        return f"Offsets updated: CPU: {cpu_value} ({cpu_offset}), GPU: {gpu_value} ({gpu_offset}), result: {str(ra_result)}"
+        result = {
+            "cpu_offset": cpu_offset,
+            "cpu_value": cpu_value,
+            "gpu_offset": gpu_offset,
+            "gpu_value": gpu_value,
+            "ryzenadj_stdout": ra_result.stdout.decode(),
+        }
+        decky_plugin.logger.info("Result: %s", result)
+        return result
 
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):

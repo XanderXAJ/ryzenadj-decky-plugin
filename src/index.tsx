@@ -6,6 +6,7 @@ import {
   PanelSectionRow,
   Router,
   ServerAPI,
+  ServerResponse,
   SliderField,
   staticClasses,
 } from "decky-frontend-lib";
@@ -17,18 +18,47 @@ interface UpdateOffsetsMethodArgs {
   gpu_offset: number;
 }
 
+interface UpdateOffsetsResponse {
+  cpu_offset: number;
+  gpu_offset: number;
+  cpu_value: string;
+  gpu_value: string;
+  ryzenadj_stdout: string;
+}
+
 const DEFAULT_CPU_OFFSET = 0;
 const DEFAULT_GPU_OFFSET = 0;
+
+const RyzenadjResult: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undefined }> = ({ result }) => {
+  if (result === undefined) {
+    return null
+  }
+  if (result.success) {
+    return (
+      <PanelSectionRow>
+        Successfully set offsets:<br />
+        CPU: {result.result?.cpu_offset}<br />
+        GPU: {result.result?.gpu_offset}
+      </PanelSectionRow>
+    )
+  } else {
+    return (
+      <PanelSectionRow>
+        Failed to set offsets: {result.result}
+      </PanelSectionRow>
+    )
+  }
+}
 
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState(DEFAULT_CPU_OFFSET);
   const [GPUOffset, setGPUOffset] = useState(DEFAULT_GPU_OFFSET);
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState<ServerResponse<UpdateOffsetsResponse> | undefined>(undefined);
   const [debug, setDebug] = useState<string>("");
 
   useEffect(() => {
     const updateOffset = async () => {
-      const result = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, string>(
+      const result = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, UpdateOffsetsResponse>(
         "update_offsets",
         {
           cpu_offset: CPUOffset,
@@ -36,7 +66,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
         }
       );
       console.log("Result:", result);
-      setResult(result.result);
+      setResult(result);
     }
 
     updateOffset();
@@ -73,9 +103,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
           Reset All
         </ButtonItem>
       </PanelSectionRow>
-      <PanelSectionRow>
-        Result: {result}
-      </PanelSectionRow>
+      <RyzenadjResult result={result} />
       <PanelSectionRow>
         Debug: {debug}
       </PanelSectionRow>
