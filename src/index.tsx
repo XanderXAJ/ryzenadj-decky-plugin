@@ -12,9 +12,9 @@ import {
 import { useEffect, useState, VFC, StrictMode } from "react";
 import { FaShip } from "react-icons/fa";
 
-interface AddMethodArgs {
-  left: number;
-  right: number;
+interface UpdateOffsetsMethodArgs {
+  cpu_offset: number;
+  gpu_offset: number;
 }
 
 const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
@@ -25,11 +25,11 @@ const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
 
   useEffect(() => {
     const updateOffset = async () => {
-      const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
-        "add",
+      const result = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, number>(
+        "update_offsets",
         {
-          left: CPUOffset,
-          right: GPUOffset,
+          cpu_offset: CPUOffset,
+          gpu_offset: GPUOffset,
         }
       );
       console.log("Result:", result);

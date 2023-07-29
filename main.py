@@ -8,8 +8,12 @@ import decky_plugin
 
 class Plugin:
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
-    async def add(self, left, right):
-        return left + right
+    async def update_offsets(self, cpu_offset, gpu_offset):
+        if cpu_offset > 0:
+            cpu_offset = -cpu_offset
+        if gpu_offset > 0:
+            gpu_offset = -gpu_offset
+        return f"Offsets updated: CPU: {cpu_offset}, GPU: {gpu_offset}"
 
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
