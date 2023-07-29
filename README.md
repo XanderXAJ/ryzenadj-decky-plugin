@@ -10,6 +10,12 @@ Reference example for using [decky-frontend-lib](https://github.com/SteamDeckHom
 
 [Follow these instructions.](https://docs.deckthemes.com/CSSLoader/Cef_Debugger/)
 
+### Debugging using `console.log()` etc.
+
+1. Follow _Debugging using CEF debugging_.
+2. Inspect the `SharedJSContext` target.
+3. In the new window, ensure the Console is open. See your logging messages.
+
 ### Debugging using React DevTools
 
 Run [the standalone version of React DevTools](https://github.com/facebook/react/tree/main/packages/react-devtools), e.g.:
