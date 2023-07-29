@@ -126,6 +126,9 @@
                 "build",
                 "deploy"
             ],
+            "presentation": {
+                "focus": true,
+            },
             "problemMatcher": []
         },
         //GENERAL TASKS
