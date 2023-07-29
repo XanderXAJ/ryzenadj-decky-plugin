@@ -10,7 +10,7 @@ import {
   staticClasses,
 } from "decky-frontend-lib";
 import { useEffect, useState, VFC, StrictMode } from "react";
-import { FaBolt } from "react-icons/fa";
+import { FaBolt } from "react-icons/fa6";
 
 interface UpdateOffsetsMethodArgs {
   cpu_offset: number;
