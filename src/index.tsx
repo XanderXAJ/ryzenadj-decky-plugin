@@ -17,9 +17,12 @@ interface UpdateOffsetsMethodArgs {
   gpu_offset: number;
 }
 
+const DEFAULT_CPU_OFFSET = 0;
+const DEFAULT_GPU_OFFSET = 0;
+
 const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
-  const [CPUOffset, setCPUOffset] = useState(0);
-  const [GPUOffset, setGPUOffset] = useState(0);
+  const [CPUOffset, setCPUOffset] = useState(DEFAULT_CPU_OFFSET);
+  const [GPUOffset, setGPUOffset] = useState(DEFAULT_GPU_OFFSET);
   const [result, setResult] = useState(0);
   const [debug, setDebug] = useState<string>("");
 
@@ -62,6 +65,15 @@ const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
             setDebug(`GPU Offset: ${newValue}`);
             setGPUOffset(newValue);
           }} />
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ButtonItem
+          onClick={() => {
+            setCPUOffset(DEFAULT_CPU_OFFSET);
+            setGPUOffset(DEFAULT_GPU_OFFSET);
+          }}>
+          Reset All
+        </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
         Result: {result}
