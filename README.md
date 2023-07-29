@@ -6,6 +6,24 @@ Reference example for using [decky-frontend-lib](https://github.com/SteamDeckHom
 
 ## Development
 
+### Enable live reloading of plugins
+
+Decky Loader can live reload plugins but the functionality is disabled by default.
+
+To enable live reloading on Steam Deck/Linux:
+
+1. Create `/etc/profile.d/decky.sh` with the following contents:
+
+   ```shell
+   LIVE_RELOAD=1
+   export LIVE_RELOAD
+   ```
+
+2. Restart the Deck/machine to load the new environment variable.
+
+Note: Live reloading only appears to occur when Decky Loader's settings are opened.
+If your plugin hasn't live reloaded, try opening Decky Loader's settings.
+
 ### Debugging using CEF debugging
 
 [Follow these instructions.](https://docs.deckthemes.com/CSSLoader/Cef_Debugger/)
