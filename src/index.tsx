@@ -45,7 +45,7 @@ const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   }, [CPUOffset, GPUOffset]);
 
   return (
-    <PanelSection title="Panel Section">
+    <PanelSection>
       <PanelSectionRow>
         <SliderField
           label="CPU Offset" showValue={true}
