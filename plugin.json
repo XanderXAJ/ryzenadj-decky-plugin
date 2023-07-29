@@ -1,5 +1,5 @@
 {
-  "name": "Ryzenadj",
+  "name": "RyzenAdj",
   "author": "XanderXAJ",
   "flags": [
     "debug",
@@ -10,7 +10,7 @@
       "template",
       "root"
     ],
-    "description": "Ryzenadj UI",
+    "description": "RyzenAdj UI",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }

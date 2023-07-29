@@ -20,7 +20,7 @@ interface UpdateOffsetsMethodArgs {
 const DEFAULT_CPU_OFFSET = 0;
 const DEFAULT_GPU_OFFSET = 0;
 
-const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
+const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState(DEFAULT_CPU_OFFSET);
   const [GPUOffset, setGPUOffset] = useState(DEFAULT_GPU_OFFSET);
   const [result, setResult] = useState(0);
@@ -113,10 +113,10 @@ export default definePlugin((serverApi: ServerAPI) => {
   });
 
   return {
-    title: <div className={staticClasses.Title}>Ryzenadj</div>,
+    title: <div className={staticClasses.Title}>RyzenAdj</div>,
     content:
       <StrictMode>
-        <RyzenadjContent serverAPI={serverApi} />
+        <RyzenAdjContent serverAPI={serverApi} />
       </StrictMode>,
     icon: <FaShip />,
     onDismount() {
