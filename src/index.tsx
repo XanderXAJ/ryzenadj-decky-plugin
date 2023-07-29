@@ -17,7 +17,7 @@ interface AddMethodArgs {
   right: number;
 }
 
-const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
+const RyzenadjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState(0);
   const [GPUOffset, setGPUOffset] = useState(0);
   const [result, setResult] = useState(0);
@@ -99,7 +99,8 @@ export default definePlugin((serverApi: ServerAPI) => {
 
   return {
     title: <div className={staticClasses.Title}>Ryzenadj</div>,
-    content: <Content serverAPI={serverApi} />,
+    content:
+        <RyzenadjContent serverAPI={serverApi} />
     icon: <FaShip />,
     onDismount() {
       serverApi.routerHook.removeRoute("/decky-plugin-test");
