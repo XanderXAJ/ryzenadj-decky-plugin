@@ -25,6 +25,7 @@ These assumptions are being made:
 
 **Update #1 2023-07-30:** Cursory examination suggests that tuned settings _do not_ need to be reapplied when the machine is plugged in to charge or unplugged, at least in Game Mode (where this plugin applies).
 No action is needed to detect charge events.
+
 **Update #2 2023-07-30:** Cursory examination suggests that tuned settings _do_ need to be reapplied after the machine is put to sleep.
 **Action is needed to detect sleep events.**
 
