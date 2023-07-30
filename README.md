@@ -1,16 +1,17 @@
 # RyzenAdj Decky Plugin
 
-Use [RyzenAdj] to tune how your Steam Deck runs in Game Mode.
+[Decky Loader][decky-loader] plugin to use [RyzenAdj] to tune how your Steam Deck runs in Game Mode.
 
+[decky-loader]: https://github.com/SteamDeckHomebrew/decky-loader
 [ryzenadj]: https://github.com/FlyGoat/RyzenAdj
 
 ## Development
 
 - [Plugin development wiki](https://wiki.deckbrew.xyz/en/user-guide/home#plugin-development)
-- [decky-frontend-lib](https://github.com/SteamDeckHomebrew/decky-frontend-lib)
-- [decky-loader](https://github.com/SteamDeckHomebrew/decky-loader)
-- [decky-plugin-database]
-- [decky-plugin-template]
+- [decky-frontend-lib](https://github.com/SteamDeckHomebrew/decky-frontend-lib) provides React components for usage in the frontend
+- [decky-loader] handles plugin loading -- it can be useful to look at its source code to see what's going on
+- [decky-plugin-database] allows the plugin to be installed from Loader's built-in store
+- [decky-plugin-template] from which this plugin is derived
 
 [decky-plugin-database]: https://github.com/SteamDeckHomebrew/decky-plugin-database
 [decky-plugin-template]: https://github.com/SteamDeckHomebrew/decky-plugin-template
