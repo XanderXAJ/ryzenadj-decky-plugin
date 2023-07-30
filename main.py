@@ -23,7 +23,7 @@ class Plugin:
 
         ra_path = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
         ra_cmd = [str(ra_path), f"--set-coall={cpu_value}", f"--set-cogfx={gpu_value}"]
-        ra_result = subprocess.run(ra_cmd, capture_output=True)
+        ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
 
         result = {
             "cpu_offset": cpu_offset,
@@ -31,8 +31,8 @@ class Plugin:
             "gpu_offset": gpu_offset,
             "gpu_value": gpu_value,
             "ryzenadj_cmd": " ".join(ra_cmd),
-            "ryzenadj_stderr": ra_result.stderr.decode(),
-            "ryzenadj_stdout": ra_result.stdout.decode(),
+            "ryzenadj_stderr": ra_result.stderr,
+            "ryzenadj_stdout": ra_result.stdout,
         }
         decky_plugin.logger.info("Result: %s", result)
         return result
