@@ -40,3 +40,7 @@ No action is needed to detect charge events.
 
 - Good, as user's desired settings will stick across events, which is likely user expectation
 - Bad, as sleep/charge events needs to be detected and responded to
+
+## More Information
+
+- [Steam Deck Software Undervolt](https://github.com/KyleGospo/Steam-Deck-Software-Undervolt/tree/main)
