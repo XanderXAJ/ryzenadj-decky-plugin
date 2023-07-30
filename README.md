@@ -5,6 +5,15 @@
 [decky-loader]: https://github.com/SteamDeckHomebrew/decky-loader
 [ryzenadj]: https://github.com/FlyGoat/RyzenAdj
 
+## Disclaimer
+
+While every effort is made to make the plugin safe and robust to use, by the very nature of the tuning [RyzenAdj] provides, it is possible to cause system instability or even hardware damage that may not be covered by Valve's warranty.
+
+By using this plugin, you accept responsibility for all consequences of using this plugin.
+The developers of this plugin accept no liability or responsibility for damages.
+
+See the [LICENSE](/LICENSE) for the full terms.
+
 ## Development
 
 - [Plugin development wiki](https://wiki.deckbrew.xyz/en/user-guide/home#plugin-development)
