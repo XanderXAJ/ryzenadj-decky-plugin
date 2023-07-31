@@ -44,7 +44,3 @@ class Plugin:
     # Function called first during the unload process, utilize this to handle your plugin being removed
     async def _unload(self):
         decky_plugin.logger.info("Goodbye from RyzenAdj!")
-
-    # Migrations that should be performed before entering `_main()`.
-    async def _migration(self):
-        decky_plugin.logger.info("Migrating")
