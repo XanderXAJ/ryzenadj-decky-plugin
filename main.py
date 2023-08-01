@@ -28,14 +28,14 @@ class RyzenAdjConfiguration:
 
 
 class RyzenAdjConfigurer:
-    def __init__(self) -> None:
+    def __init__(self, ra_path: Path) -> None:
         # TODO: Accept previous successful configuration
+        self.ra_path = ra_path
         self.active_configuration = RyzenAdjConfiguration(cpu_offset=0, gpu_offset=0)
 
     def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
-        ra_path = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
         ra_cmd = [
-            str(ra_path),
+            str(self.ra_path),
             f"--set-coall={new_configuration.cpu_value()}",
             f"--set-cogfx={new_configuration.gpu_value()}",
         ]
@@ -79,7 +79,9 @@ class Plugin:
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
         decky_plugin.logger.info("Hello from RyzenAdj!")
-        self.rac = RyzenAdjConfigurer()
+        self.rac = RyzenAdjConfigurer(
+            ra_path=Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj"),
+        )
 
     # Function called first during the unload process, utilize this to handle your plugin being removed
     async def _unload(self):
