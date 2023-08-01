@@ -1,5 +1,7 @@
 # Summary
 
+[Disclaimer](./DISCLAIMER.md)
+
 - [Chapter 1]()
 
 # Plugin Development
