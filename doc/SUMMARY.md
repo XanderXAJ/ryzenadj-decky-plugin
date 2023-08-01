@@ -2,7 +2,7 @@
 
 - [Chapter 1]()
 
-# Decisions
+# Plugin Development
 
 - [Decisions](./decisions/README.md)
     - [Reset settings](./decisions/0001-reset-settings.md)
