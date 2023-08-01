@@ -1,0 +1,53 @@
+# Based on: https://github.com/rust-lang/mdBook/wiki/Automated-Deployment%3A-GitHub-Actions
+name: Publish to GitHub Pages
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual invocations of this workflow
+
+jobs:
+  build:
+    environment:
+      BOOK_DIR: ./docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Install latest mdBook
+        run: |
+          tag=$(curl 'https://api.github.com/repos/rust-lang/mdbook/releases/latest' | jq -r '.tag_name')
+          url="https://github.com/rust-lang/mdbook/releases/download/${tag}/mdbook-${tag}-x86_64-unknown-linux-gnu.tar.gz"
+          mkdir mdbook
+          curl -sSL $url | tar -xz --directory=./mdbook
+          echo `pwd`/mdbook >> $GITHUB_PATH
+      - name: Build book
+        run: mdbook build
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./book
+  deploy:
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # To deploy to Pages
+      id-token: write # To verify that the deployment originates from an appropriate source
+
+    # Deploy to the GitHub Pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Allow one concurrent deployment
+    concurrency:
+      group: ${{ github.workflow }}-deploy
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy pages artifact
+        uses: actions/deploy-pages@v2
+        id: deployment

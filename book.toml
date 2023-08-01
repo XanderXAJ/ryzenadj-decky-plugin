@@ -1,0 +1,6 @@
+[book]
+authors = ["Alex Palmer"]
+language = "en"
+multilingual = false
+src = "doc"
+title = "RyzenAdj Decky Plugin"

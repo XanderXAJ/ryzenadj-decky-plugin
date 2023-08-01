@@ -4,6 +4,8 @@
 
 **This plugin is currently in its early stages and isn't ready for most people. If you're _very_ keen, you can build and install the plugin yourself -- see below.**
 
+[**See the RyzenAdj Decky Plugin documentation here!**](https://xanderxaj.github.io/ryzenadj-decky-plugin/)
+
 [decky-loader]: https://github.com/SteamDeckHomebrew/decky-loader
 [ryzenadj]: https://github.com/FlyGoat/RyzenAdj
 
