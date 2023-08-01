@@ -68,7 +68,7 @@ class Plugin:
         decky_plugin.logger.info("update_offsets response: %s", response)
         return response
 
-    async def current_state(self):
+    async def active_state(self):
         config = self.rac.active_configuration
 
         return {

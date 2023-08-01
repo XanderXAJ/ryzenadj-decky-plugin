@@ -9,6 +9,7 @@ import {
   ServerResponse,
   SliderField,
   staticClasses,
+  SteamSpinner,
   ToggleField,
 } from "decky-frontend-lib";
 import { useEffect, useState, VFC, StrictMode } from "react";
@@ -27,6 +28,11 @@ interface UpdateOffsetsResponse {
   ryzenadj_cmd: string;
   ryzenadj_stderr: string;
   ryzenadj_stdout: string;
+}
+
+interface ActiveStateResponse {
+  cpu_offset: number;
+  gpu_offset: number;
 }
 
 const DEFAULT_CPU_OFFSET = 0;
@@ -71,74 +77,102 @@ const RyzenAdjDebug: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undef
 }
 
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
-  const [CPUOffset, setCPUOffset] = useState(DEFAULT_CPU_OFFSET);
-  const [GPUOffset, setGPUOffset] = useState(DEFAULT_GPU_OFFSET);
+  const [CPUOffset, setCPUOffset] = useState<number | undefined>(undefined);
+  const [GPUOffset, setGPUOffset] = useState<number | undefined>(undefined);
   const [result, setResult] = useState<ServerResponse<UpdateOffsetsResponse> | undefined>(undefined);
   const [showDebug, setShowDebug] = useState<boolean>(false);
 
   useEffect(() => {
-    const updateOffset = async () => {
-      const result = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, UpdateOffsetsResponse>(
+    // Initialise configuration
+    if (CPUOffset !== undefined && GPUOffset !== undefined) return;
+
+    const initState = async () => {
+      const resp = await serverAPI.callPluginMethod<{}, ActiveStateResponse>(
+        "active_state",
+        {}
+      );
+      console.log("active_state response:", resp);
+      if (resp.success) {
+        setCPUOffset(resp.result.cpu_offset);
+        setGPUOffset(resp.result.gpu_offset);
+      }
+    }
+
+    initState();
+  }, []); // run once on initialisation
+
+  useEffect(() => {
+    // Update configuration
+    if (CPUOffset === undefined || GPUOffset === undefined) return;
+
+    const updateOffsets = async () => {
+      const response = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, UpdateOffsetsResponse>(
         "update_offsets",
         {
           cpu_offset: CPUOffset,
           gpu_offset: GPUOffset,
         }
       );
-      console.log("Result:", result);
-      setResult(result);
+      console.log("update_offsets response:", response);
+      setResult(response);
     }
 
-    updateOffset();
+    updateOffsets();
   }, [CPUOffset, GPUOffset]);
 
-  return (
-    <PanelSection>
-      <PanelSectionRow>
-        <SliderField
-          label="CPU Offset" showValue={true}
-          value={CPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={0}
-          onChange={(newValue) => {
-            console.log(`CPU Offset: ${newValue}`)
-            setCPUOffset(newValue);
-          }} />
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <SliderField
-          label="GPU Offset" showValue={true}
-          value={GPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={0}
-          onChange={(newValue) => {
-            console.log(`GPU Offset: ${newValue}`)
-            setGPUOffset(newValue);
-          }} />
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <ButtonItem
-          onClick={() => {
-            setCPUOffset(DEFAULT_CPU_OFFSET);
-            setGPUOffset(DEFAULT_GPU_OFFSET);
-          }}>
-          Reset All
-        </ButtonItem>
-      </PanelSectionRow>
-      <RyzenadjResult result={result} />
-      <PanelSectionRow>
-        <ToggleField label="Show Debug Information" checked={showDebug} onChange={setShowDebug} />
-      </PanelSectionRow>
-      {showDebug && <RyzenAdjDebug result={result} />}
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={() => {
-            Router.CloseSideMenus();
-            Router.Navigate("/decky-plugin-test");
-          }}
-        >
-          Router
-        </ButtonItem>
-      </PanelSectionRow>
-    </PanelSection>
-  );
+  if (CPUOffset === undefined || GPUOffset == undefined) {
+    return (
+      <SteamSpinner />
+    )
+  } else {
+    return (
+      <PanelSection>
+        <PanelSectionRow>
+          <SliderField
+            label="CPU Offset" showValue={true}
+            value={CPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={0}
+            onChange={(newValue) => {
+              console.log(`CPU Offset: ${newValue}`)
+              setCPUOffset(newValue);
+            }} />
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <SliderField
+            label="GPU Offset" showValue={true}
+            value={GPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={0}
+            onChange={(newValue) => {
+              console.log(`GPU Offset: ${newValue}`)
+              setGPUOffset(newValue);
+            }} />
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <ButtonItem
+            onClick={() => {
+              setCPUOffset(DEFAULT_CPU_OFFSET);
+              setGPUOffset(DEFAULT_GPU_OFFSET);
+            }}>
+            Reset All
+          </ButtonItem>
+        </PanelSectionRow>
+        <RyzenadjResult result={result} />
+        <PanelSectionRow>
+          <ToggleField label="Show Debug Information" checked={showDebug} onChange={setShowDebug} />
+        </PanelSectionRow>
+        {showDebug && <RyzenAdjDebug result={result} />}
+        <PanelSectionRow>
+          <ButtonItem
+            layout="below"
+            onClick={() => {
+              Router.CloseSideMenus();
+              Router.Navigate("/decky-plugin-test");
+            }}
+          >
+            Router
+          </ButtonItem>
+        </PanelSectionRow>
+      </PanelSection>
+    );
+  }
 };
 
 const DeckyPluginRouterTest: VFC = () => {
