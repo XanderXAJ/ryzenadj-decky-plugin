@@ -8,8 +8,6 @@ on:
 
 jobs:
   build:
-    environment:
-      BOOK_DIR: ./docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
