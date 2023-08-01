@@ -30,7 +30,7 @@ class RyzenAdjConfiguration:
 class RyzenAdjConfigurer:
     def __init__(self) -> None:
         # TODO: Accept previous successful configuration
-        self.current_configuration = RyzenAdjConfiguration(cpu_offset=0, gpu_offset=0)
+        self.active_configuration = RyzenAdjConfiguration(cpu_offset=0, gpu_offset=0)
 
     def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
         ra_path = Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj")
@@ -41,7 +41,7 @@ class RyzenAdjConfigurer:
         ]
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
         # TODO: Check exit status and don't store new configuration in case of failure
-        self.current_configuration = new_configuration
+        self.active_configuration = new_configuration
         return ra_cmd, ra_result
 
 
@@ -54,13 +54,13 @@ class Plugin:
         new_configuration = RyzenAdjConfiguration(
             cpu_offset=cpu_offset, gpu_offset=gpu_offset
         )
-        ra_cmd, ra_result = self.ra.apply_configuration(new_configuration)
+        ra_cmd, ra_result = self.rac.apply_configuration(new_configuration)
 
         response = {
-            "cpu_offset": self.ra.current_configuration.cpu_offset,
-            "cpu_value": self.ra.current_configuration.cpu_value(),
-            "gpu_offset": self.ra.current_configuration.gpu_offset,
-            "gpu_value": self.ra.current_configuration.gpu_value(),
+            "cpu_offset": self.rac.active_configuration.cpu_offset,
+            "cpu_value": self.rac.active_configuration.cpu_value(),
+            "gpu_offset": self.rac.active_configuration.gpu_offset,
+            "gpu_value": self.rac.active_configuration.gpu_value(),
             "ryzenadj_cmd": " ".join(ra_cmd),
             "ryzenadj_stderr": ra_result.stderr,
             "ryzenadj_stdout": ra_result.stdout,
@@ -69,7 +69,7 @@ class Plugin:
         return response
 
     async def current_state(self):
-        config = self.ra.current_configuration
+        config = self.rac.active_configuration
 
         return {
             "cpu_offset": config.cpu_offset,
@@ -79,7 +79,7 @@ class Plugin:
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
         decky_plugin.logger.info("Hello from RyzenAdj!")
-        self.ra = RyzenAdjConfigurer()
+        self.rac = RyzenAdjConfigurer()
 
     # Function called first during the unload process, utilize this to handle your plugin being removed
     async def _unload(self):
