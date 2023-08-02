@@ -12,11 +12,6 @@ BASE_GPU = 0x100000
 
 class RyzenAdjConfiguration:
     def __init__(self, cpu_offset: int, gpu_offset: int) -> None:
-        if cpu_offset > 0:
-            cpu_offset = -cpu_offset
-        if gpu_offset > 0:
-            gpu_offset = -gpu_offset
-
         self.cpu_offset: int = cpu_offset
         self.gpu_offset: int = gpu_offset
 
