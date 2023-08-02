@@ -1,10 +1,10 @@
 # Summary
 
 [Disclaimer](./DISCLAIMER.md)
+[Glossary](./Glossary.md)
 
 - [Chapter 1]()
 
-[Glossary](./Glossary.md)
 
 # Plugin Development
 
