@@ -57,7 +57,7 @@ const RyzenadjResult: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | unde
       </PanelSectionRow>
     )
   }
-}
+};
 
 const RyzenAdjDebug: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undefined }> = ({ result }) => {
   if (result === undefined)
@@ -74,7 +74,25 @@ const RyzenAdjDebug: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undef
     )
   }
   return null
+};
+
+type DelayedProps = {
+  delayMs: number;
+  children?: React.ReactNode;
 }
+
+const Delayed: VFC<DelayedProps> = ({ children, delayMs }) => {
+  const [show, setShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    const wait = setTimeout(() => {
+      setShow(true);
+    }, delayMs);
+    return () => clearTimeout(wait);
+  }, [delayMs]);
+
+  return show ? <div>{children}</div> : null;
+};
 
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState<number | undefined>(undefined);
@@ -122,7 +140,9 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
 
   if (CPUOffset === undefined || GPUOffset == undefined) {
     return (
-      <SteamSpinner />
+      <Delayed delayMs={600}>
+        <SteamSpinner />
+      </Delayed>
     )
   } else {
     return (
