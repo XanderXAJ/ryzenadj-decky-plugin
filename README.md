@@ -69,6 +69,8 @@ Then enter your machine's IP address (helpfully displayed by React DevTools) in 
 
 Note: _enter only the IP address_ -- don't be smart like me and also enter the port number or protocol.
 
+To find the plugin's components, since the core components of this plugin are prefixed with `RyzenAdj`, use the search bar to search for `RyzenAdj` and find them.
+
 ### Dependencies
 
 As per other Decky Loader plugins, this plugin requires Node.js v16.14+ and `pnpm` (v8.5.1) installed.
