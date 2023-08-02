@@ -35,8 +35,26 @@ interface ActiveStateResponse {
   gpu_offset: number;
 }
 
+interface UpdateAPUPowerLimitsParams {
+  limit_mW: number;
+}
+
+interface UpdateAPUPowerLimitsResponse {
+  limit_mW: number;
+  ryzenadj_cmd: string;
+  ryzenadj_stderr: string;
+  ryzenadj_stdout: string;
+}
+
+interface RyzenAdjDetailsResponse {
+  ryzenadj_cmd: string;
+  ryzenadj_stderr: string;
+  ryzenadj_stdout: string;
+}
+
 const DEFAULT_CPU_OFFSET = 0;
 const DEFAULT_GPU_OFFSET = 0;
+const DEFAULT_APU_POWER_LIMIT_MW = 15000;
 
 const RyzenadjResult: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undefined }> = ({ result }) => {
   if (result === undefined) {
@@ -59,7 +77,7 @@ const RyzenadjResult: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | unde
   }
 };
 
-const RyzenAdjDebug: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undefined }> = ({ result }) => {
+const RyzenAdjDebug: VFC<{ result: ServerResponse<RyzenAdjDetailsResponse> | undefined }> = ({ result }) => {
   if (result === undefined)
     return <PanelSectionRow>Result currently undefined</PanelSectionRow>
   if (!result.success)
@@ -98,6 +116,7 @@ const Delayed: VFC<DelayedProps> = ({ children, delayMs }) => {
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [CPUOffset, setCPUOffset] = useState<number | undefined>(undefined);
   const [GPUOffset, setGPUOffset] = useState<number | undefined>(undefined);
+  const [APUPowerLimitmW, setAPUPowerLimitmW] = useState<number>(DEFAULT_APU_POWER_LIMIT_MW);
   const [result, setResult] = useState<ServerResponse<UpdateOffsetsResponse> | undefined>(undefined);
   const [showDebug, setShowDebug] = useState<boolean>(false);
 
@@ -139,6 +158,21 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
     updateOffsets();
   }, [CPUOffset, GPUOffset]);
 
+  useEffect(() => {
+    // Update APU power limits
+    const update = async () => {
+      const response = await serverAPI.callPluginMethod<UpdateAPUPowerLimitsParams, UpdateAPUPowerLimitsResponse>(
+        "update_apu_power_limits",
+        {
+          limit_mW: APUPowerLimitmW,
+        }
+      );
+      console.log("update_apu_power_limits response:", response);
+    };
+
+    update();
+  }, [APUPowerLimitmW]);
+
   if (CPUOffset === undefined || GPUOffset == undefined) {
     return (
       <Delayed delayMs={600}>
@@ -174,6 +208,15 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
             }}>
             Reset All
           </ButtonItem>
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <SliderField
+            label="APU Power Limit" showValue={true} valueSuffix="mW"
+            value={APUPowerLimitmW} min={1000} max={15000} step={500} validValues="range" resetValue={DEFAULT_APU_POWER_LIMIT_MW} editableValue={true}
+            onChange={(newValue) => {
+              setAPUPowerLimitmW(newValue);
+            }}
+          />
         </PanelSectionRow>
         <RyzenadjResult result={result} />
         <PanelSectionRow>

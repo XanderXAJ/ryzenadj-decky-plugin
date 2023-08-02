@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 
@@ -22,6 +23,11 @@ class RyzenAdjConfiguration:
         return hex(BASE_GPU + self.gpu_offset)
 
 
+@dataclass
+class RyzenAdjAPUPowerLimitConfiguration:
+    limit_mW: int
+
+
 class RyzenAdjConfigurer:
     def __init__(self, ra_path: Path) -> None:
         # TODO: Accept previous successful configuration
@@ -43,6 +49,21 @@ class RyzenAdjConfigurer:
     def reapply_configuration(self):
         decky_plugin.logger.info("Reapplying active configuration")
         return self.apply_configuration(self.active_configuration)
+
+    def apply_apu_power_limit_configuration(
+        self, new_limit: RyzenAdjAPUPowerLimitConfiguration
+    ):
+        decky_plugin.logger.info(
+            "Applying APU power limit configuration: %s", new_limit
+        )
+        ra_cmd = [
+            str(self.ra_path),
+            f"--slow-limit={new_limit.limit_mW}",
+            f"--fast-limit={new_limit.limit_mW}",
+        ]
+        ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
+        decky_plugin.logger.info("Applied configuration: %s", ra_result)
+        return ra_cmd, ra_result
 
 
 # `self` doesn't work as expected in the Plugin class
@@ -75,6 +96,18 @@ class Plugin:
             "cpu_offset": config.cpu_offset,
             "gpu_offset": config.gpu_offset,
         }
+
+    async def update_apu_power_limits(self, limit_mW: int):
+        new_limit = RyzenAdjAPUPowerLimitConfiguration(limit_mW=limit_mW)
+        ra_cmd, ra_result = self.rac.apply_apu_power_limit_configuration(new_limit)
+
+        response = {
+            "limit_mW": limit_mW,
+            "ryzenadj_cmd": " ".join(ra_cmd),
+            "ryzenadj_stderr": ra_result.stderr,
+            "ryzenadj_stdout": ra_result.stdout,
+        }
+        return response
 
     async def on_resume_from_suspend(self):
         decky_plugin.logger.info("Resumed from sleep, reapplying configuration")
