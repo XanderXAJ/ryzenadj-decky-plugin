@@ -212,6 +212,10 @@ export default definePlugin((serverApi: ServerAPI) => {
     exact: true,
   });
 
+  const resumeHook = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
+    serverApi.callPluginMethod("on_resume_from_suspend", {});
+  });
+
   return {
     title: <div className={staticClasses.Title}>RyzenAdj</div>,
     content:
@@ -221,6 +225,7 @@ export default definePlugin((serverApi: ServerAPI) => {
     icon: <FaBolt />,
     alwaysRender: true, // Prevent UI flashing when plugin is active but QAM is closed then re-opened
     onDismount() {
+      resumeHook!.unregister();
       serverApi.routerHook.removeRoute("/decky-plugin-test");
     },
   };

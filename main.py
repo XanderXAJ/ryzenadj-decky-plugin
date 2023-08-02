@@ -40,9 +40,14 @@ class RyzenAdjConfigurer:
             f"--set-cogfx={new_configuration.gpu_value()}",
         ]
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
+        decky_plugin.logger.info("Applied configuration: %s", ra_result)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = new_configuration
         return ra_cmd, ra_result
+
+    def reapply_configuration(self):
+        decky_plugin.logger.info("Reapplying active configuration")
+        return self.apply_configuration(self.active_configuration)
 
 
 # `self` doesn't work as expected in the Plugin class
@@ -75,6 +80,10 @@ class Plugin:
             "cpu_offset": config.cpu_offset,
             "gpu_offset": config.gpu_offset,
         }
+
+    async def on_resume_from_suspend(self):
+        decky_plugin.logger.info("Resumed from sleep, reapplying configuration")
+        self.rac.reapply_configuration()
 
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
