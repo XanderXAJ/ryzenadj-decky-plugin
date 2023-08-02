@@ -15,14 +15,6 @@ import {
 import { useEffect, useState, VFC, StrictMode } from "react";
 import { FaBolt } from "react-icons/fa6";
 
-interface SteamClientSystem {
-  RegisterForOnResumeFromSuspend: any;
-}
-
-declare interface SteamClient {
-  System: SteamClientSystem;
-}
-
 interface UpdateOffsetsMethodArgs {
   cpu_offset: number;
   gpu_offset: number;

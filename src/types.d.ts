@@ -12,3 +12,11 @@ declare module "*.jpg" {
   const content: string;
   export default content;
 }
+
+interface SteamClientSystem {
+  RegisterForOnResumeFromSuspend: any;
+}
+
+declare interface SteamClient {
+  System: SteamClientSystem;
+}
