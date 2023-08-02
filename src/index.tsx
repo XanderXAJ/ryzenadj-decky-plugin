@@ -198,6 +198,7 @@ export default definePlugin((serverApi: ServerAPI) => {
         <RyzenAdjContent serverAPI={serverApi} />
       </StrictMode>,
     icon: <FaBolt />,
+    alwaysRender: true, // Prevent UI flashing when plugin is active but QAM is closed then re-opened
     onDismount() {
       serverApi.routerHook.removeRoute("/decky-plugin-test");
     },

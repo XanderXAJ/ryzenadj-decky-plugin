@@ -4,6 +4,8 @@
 
 - [Chapter 1]()
 
+[Glossary](./Glossary.md)
+
 # Plugin Development
 
 - [Decisions](./decisions/README.md)
