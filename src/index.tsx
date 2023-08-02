@@ -15,51 +15,36 @@ import {
 import { useEffect, useState, VFC, StrictMode } from "react";
 import { FaBolt } from "react-icons/fa6";
 
-interface UpdateOffsetsMethodArgs {
-  cpu_offset: number;
-  gpu_offset: number;
+interface UpdateOffsetsParams {
+  config: State
 }
 
-interface UpdateOffsetsResponse {
-  cpu_offset: number;
-  gpu_offset: number;
-  cpu_value: string;
-  gpu_value: string;
+interface DebugResponse {
   ryzenadj_cmd: string;
   ryzenadj_stderr: string;
   ryzenadj_stdout: string;
 }
 
-interface ActiveStateResponse {
-  cpu_offset: number;
-  gpu_offset: number;
-}
+interface UpdateOffsetsResponse extends State, DebugResponse { }
 
 const DEFAULT_CPU_OFFSET = 0;
 const DEFAULT_GPU_OFFSET = 0;
 
-const RyzenadjResult: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undefined }> = ({ result }) => {
+const RyzenadjResult: VFC<{ result: ServerResponse<any> | undefined }> = ({ result }) => {
   if (result === undefined) {
     return null
   }
-  if (result.success) {
-    return (
-      <PanelSectionRow>
-        Successfully set offsets:<br />
-        CPU: {result.result?.cpu_offset}<br />
-        GPU: {result.result?.gpu_offset}
-      </PanelSectionRow>
-    )
-  } else {
+  if (!result.success) {
     return (
       <PanelSectionRow>
         Failed to set offsets: {result.result}
       </PanelSectionRow>
     )
   }
+  return null;
 };
 
-const RyzenAdjDebug: VFC<{ result: ServerResponse<UpdateOffsetsResponse> | undefined }> = ({ result }) => {
+const RyzenAdjDebug: VFC<{ result: ServerResponse<DebugResponse> | undefined }> = ({ result }) => {
   if (result === undefined)
     return <PanelSectionRow>Result currently undefined</PanelSectionRow>
   if (!result.success)
@@ -95,25 +80,30 @@ const Delayed: VFC<DelayedProps> = ({ children, delayMs }) => {
   return show ? <div>{children}</div> : null;
 };
 
+type State = {
+  apply_cpu_offset: boolean;
+  cpu_offset: number;
+  apply_gpu_offset: boolean;
+  gpu_offset: number;
+  show_debug: boolean;
+}
+
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
-  const [CPUOffset, setCPUOffset] = useState<number | undefined>(undefined);
-  const [GPUOffset, setGPUOffset] = useState<number | undefined>(undefined);
+  const [state, setState] = useState<State | undefined>(undefined);
   const [result, setResult] = useState<ServerResponse<UpdateOffsetsResponse> | undefined>(undefined);
-  const [showDebug, setShowDebug] = useState<boolean>(false);
 
   useEffect(() => {
     // Initialise configuration
-    if (CPUOffset !== undefined && GPUOffset !== undefined) return;
+    if (state !== undefined) return;
 
     const initState = async () => {
-      const resp = await serverAPI.callPluginMethod<{}, ActiveStateResponse>(
+      const resp = await serverAPI.callPluginMethod<{}, State>(
         "active_state",
         {}
       );
       console.log("active_state response:", resp);
       if (resp.success) {
-        setCPUOffset(resp.result.cpu_offset);
-        setGPUOffset(resp.result.gpu_offset);
+        setState(resp.result);
       }
     }
 
@@ -122,24 +112,23 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
 
   useEffect(() => {
     // Update configuration
-    if (CPUOffset === undefined || GPUOffset === undefined) return;
+    if (state === undefined) return;
 
-    const updateOffsets = async () => {
-      const response = await serverAPI.callPluginMethod<UpdateOffsetsMethodArgs, UpdateOffsetsResponse>(
-        "update_offsets",
+    const updateRyzenadjConfig = async () => {
+      const response = await serverAPI.callPluginMethod<UpdateOffsetsParams, UpdateOffsetsResponse>(
+        "update_ryzenadj_config",
         {
-          cpu_offset: CPUOffset,
-          gpu_offset: GPUOffset,
+          config: state
         }
       );
-      console.log("update_offsets response:", response);
+      console.log("update_ryzenadj_config response:", response);
       setResult(response);
     }
 
-    updateOffsets();
-  }, [CPUOffset, GPUOffset]);
+    updateRyzenadjConfig();
+  }, [state]);
 
-  if (CPUOffset === undefined || GPUOffset == undefined) {
+  if (state === undefined) {
     return (
       <Delayed delayMs={600}>
         <SteamSpinner />
@@ -151,35 +140,50 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
         <PanelSectionRow>
           <SliderField
             label="CPU Offset" showValue={true}
-            value={CPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_CPU_OFFSET}
+            value={state.cpu_offset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_CPU_OFFSET}
             onChange={(newValue) => {
               console.log(`CPU Offset: ${newValue}`)
-              setCPUOffset(newValue);
+              setState({
+                ...state,
+                cpu_offset: newValue,
+              })
             }} />
         </PanelSectionRow>
         <PanelSectionRow>
           <SliderField
             label="GPU Offset" showValue={true}
-            value={GPUOffset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_GPU_OFFSET}
+            value={state.gpu_offset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_GPU_OFFSET}
             onChange={(newValue) => {
               console.log(`GPU Offset: ${newValue}`)
-              setGPUOffset(newValue);
+              setState({
+                ...state,
+                gpu_offset: newValue,
+              })
             }} />
         </PanelSectionRow>
         <PanelSectionRow>
           <ButtonItem
             onClick={() => {
-              setCPUOffset(DEFAULT_CPU_OFFSET);
-              setGPUOffset(DEFAULT_GPU_OFFSET);
+              setState({
+                ...state,
+                cpu_offset: DEFAULT_CPU_OFFSET,
+                gpu_offset: DEFAULT_GPU_OFFSET,
+              })
             }}>
             Reset All
           </ButtonItem>
         </PanelSectionRow>
         <RyzenadjResult result={result} />
         <PanelSectionRow>
-          <ToggleField label="Show Debug Information" checked={showDebug} onChange={setShowDebug} />
+          <ToggleField label="Show Debug Information" checked={state.show_debug}
+            onChange={(newValue) => {
+              setState({
+                ...state,
+                show_debug: newValue
+              })
+            }} />
         </PanelSectionRow>
-        {showDebug && <RyzenAdjDebug result={result} />}
+        {state.show_debug && <RyzenAdjDebug result={result} />}
         <PanelSectionRow>
           <ButtonItem
             layout="below"

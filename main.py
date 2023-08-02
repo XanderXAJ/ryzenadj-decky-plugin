@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 import subprocess
+from typing import ClassVar
 
 # The decky plugin module is located at decky-loader/plugin
 # For easy intellisense checkout the decky-loader code one directory up
 # or add the `decky-loader/plugin` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky_plugin
-
-BASE_CPU = 0x100000
-BASE_GPU = 0x100000
 
 
 @dataclass
@@ -17,12 +15,16 @@ class RyzenAdjConfiguration:
     cpu_offset: int
     apply_gpu_offset: bool
     gpu_offset: int
+    show_debug: bool
+
+    BASE_CPU: ClassVar[int] = 0x100000
+    BASE_GPU: ClassVar[int] = 0x100000
 
     def cpu_value(self) -> str:
-        return hex(BASE_CPU + self.cpu_offset)
+        return hex(self.BASE_CPU + self.cpu_offset)
 
     def gpu_value(self) -> str:
-        return hex(BASE_GPU + self.gpu_offset)
+        return hex(self.BASE_GPU + self.gpu_offset)
 
     def flags(self) -> list[str]:
         flags = []
@@ -38,7 +40,11 @@ class RyzenAdjConfigurer:
         # TODO: Accept previous successful configuration
         self.ra_path = ra_path
         self.active_configuration = RyzenAdjConfiguration(
-            apply_cpu_offset=True, cpu_offset=0, apply_gpu_offset=True, gpu_offset=0
+            apply_cpu_offset=True,
+            cpu_offset=0,
+            apply_gpu_offset=True,
+            gpu_offset=0,
+            show_debug=False,
         )
 
     def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
@@ -62,20 +68,18 @@ class RyzenAdjConfigurer:
 #     https://github.com/SteamDeckHomebrew/decky-loader/issues/509
 class Plugin:
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
-    async def update_offsets(self, cpu_offset: int, gpu_offset: int):
-        new_configuration = RyzenAdjConfiguration(
-            apply_cpu_offset=True,
-            cpu_offset=cpu_offset,
-            apply_gpu_offset=True,
-            gpu_offset=gpu_offset,
-        )
+    async def update_ryzenadj_config(self, config: dict):
+        new_configuration = RyzenAdjConfiguration(**config)
         ra_cmd, ra_result = self.rac.apply_configuration(new_configuration)
+        config = self.rac.active_configuration
 
         response = {
-            "cpu_offset": self.rac.active_configuration.cpu_offset,
-            "cpu_value": self.rac.active_configuration.cpu_value(),
-            "gpu_offset": self.rac.active_configuration.gpu_offset,
-            "gpu_value": self.rac.active_configuration.gpu_value(),
+            "apply_cpu_offset": config.apply_cpu_offset,
+            "cpu_offset": config.cpu_offset,
+            "cpu_value": config.cpu_value(),
+            "apply_gpu_offset": config.apply_gpu_offset,
+            "gpu_offset": config.gpu_offset,
+            "gpu_value": config.gpu_value(),
             "ryzenadj_cmd": " ".join(ra_cmd),
             "ryzenadj_stderr": ra_result.stderr,
             "ryzenadj_stdout": ra_result.stdout,
@@ -87,8 +91,11 @@ class Plugin:
         config = self.rac.active_configuration
 
         return {
+            "apply_cpu_offset": config.apply_cpu_offset,
             "cpu_offset": config.cpu_offset,
+            "apply_gpu_offset": config.apply_gpu_offset,
             "gpu_offset": config.gpu_offset,
+            "show_debug": config.show_debug,
         }
 
     async def on_resume_from_suspend(self):
