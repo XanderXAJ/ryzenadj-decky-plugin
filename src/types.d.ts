@@ -13,8 +13,12 @@ declare module "*.jpg" {
   export default content;
 }
 
+interface SteamClientHook {
+  unregister: () => void;
+}
+
 interface SteamClientSystem {
-  RegisterForOnResumeFromSuspend: any;
+  RegisterForOnResumeFromSuspend: (callback: () => void) => SteamClientHook;
 }
 
 declare interface SteamClient {
