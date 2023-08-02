@@ -25,6 +25,7 @@ See the [LICENSE](/LICENSE) for the full terms.
 - [decky-loader] handles plugin loading -- it can be useful to look at its source code to see what's going on
 - [decky-plugin-database] allows the plugin to be installed from Loader's built-in store
 - [decky-plugin-template] from which this plugin is derived
+- [React TypeScript Cheatsheets](https://react-typescript-cheatsheet.netlify.app/) has lots of useful info for developing the frontend
 
 [decky-plugin-database]: https://github.com/SteamDeckHomebrew/decky-plugin-database
 [decky-plugin-template]: https://github.com/SteamDeckHomebrew/decky-plugin-template
