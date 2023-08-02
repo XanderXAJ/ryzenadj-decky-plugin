@@ -81,6 +81,7 @@ type DelayedProps = {
   children?: React.ReactNode;
 }
 
+// Delay rendering the children to avoid flickering upon quick requests/loading operations
 const Delayed: VFC<DelayedProps> = ({ children, delayMs }) => {
   const [show, setShow] = useState<boolean>(false);
 
