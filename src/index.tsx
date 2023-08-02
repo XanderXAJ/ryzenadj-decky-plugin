@@ -138,29 +138,49 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
     return (
       <PanelSection>
         <PanelSectionRow>
-          <SliderField
-            label="CPU Offset" showValue={true}
-            value={state.cpu_offset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_CPU_OFFSET}
+          <ToggleField label="Apply CPU Offset" checked={state.apply_cpu_offset}
             onChange={(newValue) => {
-              console.log(`CPU Offset: ${newValue}`)
               setState({
                 ...state,
-                cpu_offset: newValue,
+                apply_cpu_offset: newValue
               })
             }} />
         </PanelSectionRow>
+        {state.apply_cpu_offset &&
+          <PanelSectionRow>
+            <SliderField
+              label="CPU Offset" showValue={true}
+              value={state.cpu_offset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_CPU_OFFSET}
+              onChange={(newValue) => {
+                console.log(`CPU Offset: ${newValue}`)
+                setState({
+                  ...state,
+                  cpu_offset: newValue,
+                })
+              }} />
+          </PanelSectionRow>}
         <PanelSectionRow>
-          <SliderField
-            label="GPU Offset" showValue={true}
-            value={state.gpu_offset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_GPU_OFFSET}
+          <ToggleField label="Apply GPU Offset" checked={state.apply_gpu_offset}
             onChange={(newValue) => {
-              console.log(`GPU Offset: ${newValue}`)
               setState({
                 ...state,
-                gpu_offset: newValue,
+                apply_gpu_offset: newValue
               })
             }} />
         </PanelSectionRow>
+        {state.apply_gpu_offset &&
+          <PanelSectionRow>
+            <SliderField
+              label="GPU Offset" showValue={true}
+              value={state.gpu_offset} min={-30} max={0} step={1} validValues="range" resetValue={DEFAULT_GPU_OFFSET}
+              onChange={(newValue) => {
+                console.log(`GPU Offset: ${newValue}`)
+                setState({
+                  ...state,
+                  gpu_offset: newValue,
+                })
+              }} />
+          </PanelSectionRow>}
         <PanelSectionRow>
           <ButtonItem
             onClick={() => {
