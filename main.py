@@ -13,7 +13,9 @@ BASE_GPU = 0x100000
 
 @dataclass
 class RyzenAdjConfiguration:
+    apply_cpu_offset: bool
     cpu_offset: int
+    apply_gpu_offset: bool
     gpu_offset: int
 
     def cpu_value(self) -> str:
@@ -23,17 +25,21 @@ class RyzenAdjConfiguration:
         return hex(BASE_GPU + self.gpu_offset)
 
     def flags(self) -> list[str]:
-        return [
-            f"--set-coall={self.cpu_value()}",
-            f"--set-cogfx={self.gpu_value()}",
-        ]
+        flags = []
+        if self.apply_cpu_offset:
+            flags.append(f"--set-coall={self.cpu_value()}")
+        if self.apply_gpu_offset:
+            flags.append(f"--set-cogfx={self.gpu_value()}")
+        return flags
 
 
 class RyzenAdjConfigurer:
     def __init__(self, ra_path: Path) -> None:
         # TODO: Accept previous successful configuration
         self.ra_path = ra_path
-        self.active_configuration = RyzenAdjConfiguration(cpu_offset=0, gpu_offset=0)
+        self.active_configuration = RyzenAdjConfiguration(
+            apply_cpu_offset=True, cpu_offset=0, apply_gpu_offset=True, gpu_offset=0
+        )
 
     def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
         ra_cmd = [
@@ -58,7 +64,10 @@ class Plugin:
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
     async def update_offsets(self, cpu_offset: int, gpu_offset: int):
         new_configuration = RyzenAdjConfiguration(
-            cpu_offset=cpu_offset, gpu_offset=gpu_offset
+            apply_cpu_offset=True,
+            cpu_offset=cpu_offset,
+            apply_gpu_offset=True,
+            gpu_offset=gpu_offset,
         )
         ra_cmd, ra_result = self.rac.apply_configuration(new_configuration)
 
