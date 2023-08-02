@@ -27,6 +27,13 @@ interface DebugResponse {
 
 interface UpdateOffsetsResponse extends State, DebugResponse { }
 
+const DEFAULT_STATE: State = {
+  apply_cpu_offset: true,
+  cpu_offset: 0,
+  apply_gpu_offset: false,
+  gpu_offset: 0,
+  show_debug: false,
+}
 const DEFAULT_CPU_OFFSET = 0;
 const DEFAULT_GPU_OFFSET = 0;
 
@@ -184,11 +191,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
         <PanelSectionRow>
           <ButtonItem
             onClick={() => {
-              setState({
-                ...state,
-                cpu_offset: DEFAULT_CPU_OFFSET,
-                gpu_offset: DEFAULT_GPU_OFFSET,
-              })
+              setState(DEFAULT_STATE)
             }}>
             Reset All
           </ButtonItem>

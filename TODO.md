@@ -1,6 +1,7 @@
 # TODO
 
 - Frontend+Backend: Supply default/reset values for settings from backend for maximum configurability and centralise as much logic as possible in backend
+- Frontend+Backend: Separate app configuration (e.g. show_debug) from RyzenAdj configuration within state
 - Backend: On plugin load, restore tuned settings, except when a crash is detected
 - Backend: On plugin load, do not reapply tuned settings if specific button combination is held
 - Frontend: Add modal when the plugin is first loaded to warn about crashes, advise on making small modifications, etc.

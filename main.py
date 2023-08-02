@@ -42,7 +42,7 @@ class RyzenAdjConfigurer:
         self.active_configuration = RyzenAdjConfiguration(
             apply_cpu_offset=True,
             cpu_offset=0,
-            apply_gpu_offset=True,
+            apply_gpu_offset=False,
             gpu_offset=0,
             show_debug=False,
         )
