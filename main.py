@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 
@@ -10,16 +11,22 @@ BASE_CPU = 0x100000
 BASE_GPU = 0x100000
 
 
+@dataclass
 class RyzenAdjConfiguration:
-    def __init__(self, cpu_offset: int, gpu_offset: int) -> None:
-        self.cpu_offset: int = cpu_offset
-        self.gpu_offset: int = gpu_offset
+    cpu_offset: int
+    gpu_offset: int
 
     def cpu_value(self) -> str:
         return hex(BASE_CPU + self.cpu_offset)
 
     def gpu_value(self) -> str:
         return hex(BASE_GPU + self.gpu_offset)
+
+    def flags(self) -> list[str]:
+        return [
+            f"--set-coall={self.cpu_value()}",
+            f"--set-cogfx={self.gpu_value()}",
+        ]
 
 
 class RyzenAdjConfigurer:
@@ -31,8 +38,7 @@ class RyzenAdjConfigurer:
     def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
         ra_cmd = [
             str(self.ra_path),
-            f"--set-coall={new_configuration.cpu_value()}",
-            f"--set-cogfx={new_configuration.gpu_value()}",
+            *new_configuration.flags(),
         ]
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
         decky_plugin.logger.info("Applied configuration: %s", ra_result)
