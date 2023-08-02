@@ -11,3 +11,4 @@
 - Documentation: Test if userdata can be mounted when booting from external media
     - If so, consider: Backend: Only apply settings if e.g. `apply_settings_on_boot` file exists, to allow people to delete it using recovery media without needing to format userdata
 - Frontend: Don't send configuration update immediately after initialising
+- Frontend+Backend: Consider deduplicating CPU and GPU offset handling
