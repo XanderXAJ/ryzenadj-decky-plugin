@@ -1,7 +1,7 @@
 {
   "name": "ryzenadj-decky-plugin",
   "version": "0.0.1",
-  "description": "A template to quickly create decky plugins from scratch, based on TypeScript and webpack",
+  "description": "Decky Loader plugin to use RyzenAdj to tune how your Steam Deck runs in Game Mode",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
     "watch": "rollup -c -w",
@@ -9,21 +9,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SteamDeckHomebrew/decky-plugin-template.git"
+    "url": "https://github.com/XanderXAJ/ryzenadj-decky-plugin.git"
   },
   "keywords": [
     "decky",
     "plugin",
-    "plugin-template",
     "steam-deck",
-    "deck"
+    "deck",
+    "ryzenadj"
   ],
-  "author": "Jonas Dellinger <jonas@dellinger.dev>",
+  "author": "Alex Palmer <XanderXAJ@users.noreply.github.com>",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/SteamDeckHomebrew/decky-plugin-template/issues"
+    "url": "https://github.com/XanderXAJ/ryzenadj-decky-plugin/issues"
   },
-  "homepage": "https://github.com/SteamDeckHomebrew/decky-plugin-template#readme",
+  "homepage": "https://xanderxaj.github.io/ryzenadj-decky-plugin/",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
