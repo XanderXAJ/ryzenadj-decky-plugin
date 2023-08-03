@@ -20,6 +20,13 @@ class RyzenAdjConfiguration:
     BASE_CPU: ClassVar[int] = 0x100000
     BASE_GPU: ClassVar[int] = 0x100000
 
+    def __post_init__(self):
+        # Protect against potential overvolting, at least until there is a use case
+        if self.cpu_offset > 0:
+            self.cpu_offset = 0
+        if self.gpu_offset > 0:
+            self.gpu_offset = 0
+
     def cpu_value(self) -> str:
         return hex(self.BASE_CPU + self.cpu_offset)
 
