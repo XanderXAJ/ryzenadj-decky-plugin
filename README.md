@@ -116,3 +116,7 @@ See the [`/backend`](/backend/) directory for more details.
 
 Special thanks to @FlyGoat and the contributors of [RyzenAdj].
 Without [RyzenAdj], this plugin would not have been possible.
+
+In addition, special thanks to the [Steam Deck Homebrew community][SteamDeckHomebrew] for providing both [Decky Loader][decky-loader], [the plugin template][decky-plugin-template], and help to all my questions on how to accomplish my goals.
+
+[SteamDeckHomebrew](https://github.com/SteamDeckHomebrew)
