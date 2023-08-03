@@ -111,3 +111,8 @@ pnpm update decky-frontend-lib --latest
 
 This plugin builds [RyzenAdj] from source as it does not provide pre-built binaries.
 See the [`/backend`](/backend/) directory for more details.
+
+## Special Thanks
+
+Special thanks to @FlyGoat and the contributors of [RyzenAdj].
+Without [RyzenAdj], this plugin would not have been possible.
