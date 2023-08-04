@@ -13,3 +13,8 @@ The are a few intentions:
 Each decision has been written in a format akin to the [MADR (Markdown Any Decision Records) template][madr].
 
 [madr]: https://adr.github.io/madr/
+
+## Making a new decision
+
+Copy `TEMPLATE.md` and give it an appropriate name.
+Each decision must have a unique ID number.
