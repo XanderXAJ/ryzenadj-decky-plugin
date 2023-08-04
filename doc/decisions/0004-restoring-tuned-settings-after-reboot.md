@@ -1,5 +1,7 @@
 # Restoring tuned settings after reboot
 
+## Context and Problem Statement
+
 When the machine has rebooted, any previously applied tuned settings will be lost.
 This means that they need to be reapplied.
 
