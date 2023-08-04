@@ -6,7 +6,7 @@ Add detail about the decision to be made.
 
 ## Decision Drivers
 
-- Important
+- Important factors in deciding go here
 
 ## Considered Options
 
