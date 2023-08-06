@@ -1,12 +1,21 @@
 from dataclasses import dataclass
 from pathlib import Path
 import subprocess
-from typing import ClassVar
+from typing import ClassVar, Generic, TypeVar
 
 # The decky plugin module is located at decky-loader/plugin
 # For easy intellisense checkout the decky-loader code one directory up
 # or add the `decky-loader/plugin` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky_plugin
+
+
+T = TypeVar("T")
+
+
+@dataclass
+class ChangedValue(Generic[T]):
+    old: T
+    new: T
 
 
 @dataclass
@@ -33,13 +42,31 @@ class RyzenAdjConfiguration:
     def gpu_value(self) -> str:
         return hex(self.BASE_GPU + self.gpu_offset)
 
-    def flags(self) -> list[str]:
-        flags = []
-        if self.apply_cpu_offset:
-            flags.append(f"--set-coall={self.cpu_value()}")
-        if self.apply_gpu_offset:
-            flags.append(f"--set-cogfx={self.gpu_value()}")
-        return flags
+    def compare_to_new(self, new: "RyzenAdjConfiguration") -> dict[str, ChangedValue]:
+        if self == new:
+            return {}
+
+        differences = {}
+
+        # I could probably do some metaprogramming here but I'm not sure that would be as clear...
+        if self.apply_cpu_offset != new.apply_cpu_offset:
+            differences["apply_cpu_offset"] = ChangedValue[int](
+                old=self.apply_cpu_offset, new=new.apply_cpu_offset
+            )
+        if self.cpu_offset != new.cpu_offset:
+            differences["cpu_offset"] = ChangedValue[int](
+                old=self.cpu_offset, new=new.cpu_offset
+            )
+        if self.apply_gpu_offset != new.apply_gpu_offset:
+            differences["apply_gpu_offset"] = ChangedValue[bool](
+                old=self.apply_gpu_offset, new=new.apply_gpu_offset
+            )
+        if self.gpu_offset != new.gpu_offset:
+            differences["gpu_offset"] = ChangedValue[bool](
+                old=self.gpu_offset, new=new.gpu_offset
+            )
+
+        return differences
 
 
 class RyzenAdjConfigurer:
@@ -54,11 +81,50 @@ class RyzenAdjConfigurer:
             show_debug=False,
         )
 
+    @staticmethod
+    def ra_flags(
+        new: RyzenAdjConfiguration, differences: dict[str, ChangedValue]
+    ) -> list[str]:
+        flags: dict[str, str] = {}
+
+        # Apply changed CPU offset if enabled
+        if "cpu_offset" in differences and new.apply_cpu_offset:
+            flags["--set-coall"] = new.cpu_value()
+
+        # If CPU offset just enabled, re-apply previously configured offset
+        if "apply_cpu_offset" in differences and new.apply_cpu_offset:
+            flags["--set-coall"] = new.cpu_value()
+
+        # If CPU offset just disabled, reset CPU offset to default
+        if "apply_cpu_offset" in differences and not new.apply_cpu_offset:
+            flags["--set-coall"] = "0x100000"
+
+        # Apply changed GPU offset if enabled
+        if "gpu_offset" in differences and new.apply_gpu_offset:
+            flags["--set-cogfx"] = new.gpu_value()
+
+        # If GPU offset just enabled, re-apply previously configured offset
+        if "apply_gpu_offset" in differences and new.apply_gpu_offset:
+            flags["--set-cogfx"] = new.gpu_value()
+
+        # If GPU offset just disabled, reset GPU offset to default
+        if "apply_gpu_offset" in differences and not new.apply_gpu_offset:
+            flags["--set-cogfx"] = "0x100000"
+
+        return [f"{k}={v}" for k, v in flags.items()]
+
     def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
+        config_diff = self.active_configuration.compare_to_new(new_configuration)
+        # TODO: Do nothing if no changes occurred
+
+        decky_plugin.logger.info("config_diff: %s", config_diff)
+        ra_flags = self.ra_flags(new_configuration, config_diff)
+        decky_plugin.logger.info("ra_flags: %s", config_diff)
         ra_cmd = [
             str(self.ra_path),
-            *new_configuration.flags(),
+            *ra_flags,
         ]
+        decky_plugin.logger.info("ra_cmd: %s", ra_cmd)
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
         decky_plugin.logger.info("Applied configuration: %s", ra_result)
         # TODO: Check exit status and don't store new configuration in case of failure
