@@ -34,19 +34,39 @@ See the [LICENSE](/LICENSE) for the full terms.
 
 Decky Loader can live reload plugins but the functionality is disabled by default.
 
-To enable live reloading on Steam Deck/Linux:
+To enable live reloading on Steam Deck/Linux, we'll add the needed environment variable to Decky's `plugin_loader` service:
 
-1. Create `/etc/profile.d/decky.sh` with the following contents:
+1. Run:
 
    ```shell
-   LIVE_RELOAD=1
-   export LIVE_RELOAD
+   sudo systemctl edit plugin_loader.service
+   ```
+
+   This creates an override file where we can add an environment variable.
+
+2. Add the following in between the comments:
+
+   ```shell
+   Environment=LIVE_RELOAD=1
+   ```
+
+   It'll look something like this when done:
+
+   ```
+   ### Editing /etc/systemd/system/plugin_loader.service.d/override.conf
+   ### Anything between here and the comment below will become the new contents of the file
+
+   Environment=LIVE_RELOAD=1
+
+   ### Lines below this comment will be discarded
+   # ...
    ```
 
 2. Restart the Deck/machine to load the new environment variable.
 
-Note: Live reloading only appears to occur when Decky Loader's settings are opened.
-If your plugin hasn't live reloaded, try opening Decky Loader's settings.
+Note: It takes a few moments to detect changes have occurred.
+Additionally, it'll only hot reload if your plugin is currently not being displayed.
+If your plugin hasn't live reloaded, try closing your plugin's UI.
 
 ### Debugging using CEF debugging
 
