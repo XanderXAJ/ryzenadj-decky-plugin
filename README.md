@@ -62,7 +62,7 @@ To enable live reloading on Steam Deck/Linux, we'll add the needed environment v
    # ...
    ```
 
-2. Restart the Deck/machine to load the new environment variable.
+3. Restart the Deck/machine to load the new environment variable.
 
 Note: It takes a few moments to detect changes have occurred.
 Additionally, it'll only hot reload if your plugin is currently not being displayed.
