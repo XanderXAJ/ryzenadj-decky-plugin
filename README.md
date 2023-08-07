@@ -68,6 +68,8 @@ Note: It takes a few moments to detect changes have occurred.
 Additionally, it'll only hot reload if your plugin is currently not being displayed.
 If your plugin hasn't live reloaded, try closing your plugin's UI.
 
+Technical Note: Strictly speaking, the `LIVE_RELOAD` environment variable only affects the frontend code -- backend code is always hot reloaded.
+
 ### Debugging using CEF debugging
 
 [Follow these instructions.](https://docs.deckthemes.com/CSSLoader/Cef_Debugger/)
