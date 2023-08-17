@@ -73,8 +73,7 @@ class RyzenAdjConfigurer:
     def __init__(self, ra_path: Path, initial_config: RyzenAdjConfiguration) -> None:
         # TODO: Accept previous successful configuration
         self.ra_path = ra_path
-        self.active_configuration = None  # Set up when configuration applied
-        self.apply_force_configuration(initial_config)
+        self.active_configuration = initial_config
 
     @staticmethod
     def generate_full_ra_flags(config: RyzenAdjConfiguration) -> list[str]:
@@ -156,6 +155,15 @@ class RyzenAdjConfigurer:
         return ra_cmd, ra_result
 
 
+DEFAULT_RYZENADJ_CONFIG = RyzenAdjConfiguration(
+    apply_cpu_offset=True,
+    cpu_offset=0,
+    apply_gpu_offset=False,
+    gpu_offset=0,
+    show_debug=False,
+)
+
+
 # `self` doesn't work as expected in the Plugin class
 # as it is not properly inited by Decky Loader:
 #     https://github.com/SteamDeckHomebrew/decky-loader/issues/509
@@ -200,14 +208,9 @@ class Plugin:
         decky_plugin.logger.info("Hello from RyzenAdj!")
         self.rac = RyzenAdjConfigurer(
             ra_path=Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj"),
-            initial_config=RyzenAdjConfiguration(
-                apply_cpu_offset=True,
-                cpu_offset=0,
-                apply_gpu_offset=False,
-                gpu_offset=0,
-                show_debug=False,
-            ),
+            initial_config=DEFAULT_RYZENADJ_CONFIG,
         )
+        self.rac.apply_force_configuration(DEFAULT_RYZENADJ_CONFIG)
 
     # Function called first during the unload process, utilize this to handle your plugin being removed
     async def _unload(self):
