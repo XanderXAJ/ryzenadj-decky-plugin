@@ -70,16 +70,11 @@ class RyzenAdjConfiguration:
 
 
 class RyzenAdjConfigurer:
-    def __init__(self, ra_path: Path) -> None:
+    def __init__(self, ra_path: Path, initial_config: RyzenAdjConfiguration) -> None:
         # TODO: Accept previous successful configuration
         self.ra_path = ra_path
-        self.active_configuration = RyzenAdjConfiguration(
-            apply_cpu_offset=True,
-            cpu_offset=0,
-            apply_gpu_offset=False,
-            gpu_offset=0,
-            show_debug=False,
-        )
+        self.active_configuration = None  # Set up when configuration applied
+        self.apply_force_configuration(initial_config)
 
     @staticmethod
     def generate_full_ra_flags(config: RyzenAdjConfiguration) -> list[str]:
@@ -205,6 +200,13 @@ class Plugin:
         decky_plugin.logger.info("Hello from RyzenAdj!")
         self.rac = RyzenAdjConfigurer(
             ra_path=Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj"),
+            initial_config=RyzenAdjConfiguration(
+                apply_cpu_offset=True,
+                cpu_offset=0,
+                apply_gpu_offset=False,
+                gpu_offset=0,
+                show_debug=False,
+            ),
         )
 
     # Function called first during the unload process, utilize this to handle your plugin being removed
