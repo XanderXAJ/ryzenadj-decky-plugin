@@ -82,7 +82,19 @@ class RyzenAdjConfigurer:
         )
 
     @staticmethod
-    def ra_flags(
+    def generate_full_ra_flags(config: RyzenAdjConfiguration) -> list[str]:
+        flags: dict[str, str] = {}
+
+        if config.apply_cpu_offset:
+            flags["--set-coall"] = config.cpu_value()
+
+        if config.apply_gpu_offset:
+            flags["--set-gfxall"] = config.gpu_value()
+
+        return [f"{k}={v}" for k, v in flags.items()]
+
+    @staticmethod
+    def generate_delta_ra_flags(
         new: RyzenAdjConfiguration, differences: dict[str, ChangedValue]
     ) -> list[str]:
         flags: dict[str, str] = {}
@@ -113,13 +125,31 @@ class RyzenAdjConfigurer:
 
         return [f"{k}={v}" for k, v in flags.items()]
 
-    def apply_configuration(self, new_configuration: RyzenAdjConfiguration):
+    def apply_new_configuration(self, new_configuration: RyzenAdjConfiguration):
         config_diff = self.active_configuration.compare_to_new(new_configuration)
         # TODO: Do nothing if no changes occurred
 
         decky_plugin.logger.info("config_diff: %s", config_diff)
-        ra_flags = self.ra_flags(new_configuration, config_diff)
-        decky_plugin.logger.info("ra_flags: %s", config_diff)
+        ra_flags = self.generate_delta_ra_flags(new_configuration, config_diff)
+        result = self.__exec_ra(ra_flags)
+        # TODO: Check exit status and don't store new configuration in case of failure
+        self.active_configuration = new_configuration
+        return result
+
+    def apply_force_configuration(self, configuration: RyzenAdjConfiguration):
+        ra_flags = self.generate_full_ra_flags(configuration)
+        result = self.__exec_ra(ra_flags)
+        # TODO: Check exit status and don't store new configuration in case of failure
+        self.active_configuration = configuration
+        return result
+
+    def reapply_configuration(self):
+        decky_plugin.logger.info("Reapplying active configuration")
+        # FIX: This isn't going to work with the change detection
+        return self.apply_force_configuration(self.active_configuration)
+
+    def __exec_ra(self, ra_flags: list[str]):
+        decky_plugin.logger.info("ra_flags: %s", ra_flags)
         ra_cmd = [
             str(self.ra_path),
             *ra_flags,
@@ -128,12 +158,7 @@ class RyzenAdjConfigurer:
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
         decky_plugin.logger.info("Applied configuration: %s", ra_result)
         # TODO: Check exit status and don't store new configuration in case of failure
-        self.active_configuration = new_configuration
         return ra_cmd, ra_result
-
-    def reapply_configuration(self):
-        decky_plugin.logger.info("Reapplying active configuration")
-        return self.apply_configuration(self.active_configuration)
 
 
 # `self` doesn't work as expected in the Plugin class
@@ -143,7 +168,7 @@ class Plugin:
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
     async def update_ryzenadj_config(self, config: dict):
         new_configuration = RyzenAdjConfiguration(**config)
-        ra_cmd, ra_result = self.rac.apply_configuration(new_configuration)
+        ra_cmd, ra_result = self.rac.apply_new_configuration(new_configuration)
         config = self.rac.active_configuration
 
         response = {
