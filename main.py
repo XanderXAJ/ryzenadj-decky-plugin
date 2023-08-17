@@ -139,7 +139,6 @@ class RyzenAdjConfigurer:
 
     def reapply_configuration(self):
         decky_plugin.logger.info("Reapplying active configuration")
-        # FIX: This isn't going to work with the change detection
         return self.apply_force_configuration(self.active_configuration)
 
     def __exec_ra(self, ra_flags: list[str]):
