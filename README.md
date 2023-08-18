@@ -107,9 +107,9 @@ As per other Decky Loader plugins, this plugin requires Node.js v16.14+ and `pnp
 
 Please make sure to install pnpm v8.5.1 to prevent issues with [decky-plugin-database] CI during plugin submission.
 
-`pnpm` is most easily installed via `npm`:
+`pnpm` is most easily installed via `npm`.
 
-#### Linux
+#### Install pnpm on Linux
 
 ```bash
 sudo npm i -g pnpm@8.5.1
