@@ -15,17 +15,33 @@ import {
 import { useEffect, useState, VFC, StrictMode } from "react";
 import { FaBolt } from "react-icons/fa6";
 
-interface UpdateOffsetsParams {
-  config: State
+type State = {
+  apply_cpu_offset: boolean;
+  cpu_offset: number;
+  apply_gpu_offset: boolean;
+  gpu_offset: number;
+  show_debug: boolean;
 }
 
-interface DebugResponse {
+interface RyzenAdjDetailsResponse {
   ryzenadj_cmd: string;
   ryzenadj_stderr: string;
   ryzenadj_stdout: string;
 }
+interface RyzenAdjWasExecutedResponse {
+  ryzenadj_executed: true;
+  ryzenadj_details: RyzenAdjDetailsResponse;
+}
+interface RyzenAdjNotExecutedResponse {
+  ryzenadj_executed: false;
+  ryzenadj_details: undefined;
+}
+type RyzenAdjExecutedResponse = RyzenAdjWasExecutedResponse | RyzenAdjNotExecutedResponse;
 
-interface UpdateOffsetsResponse extends State, DebugResponse { }
+interface UpdateOffsetsParams {
+  config: State
+}
+type UpdateOffsetsResponse = State & RyzenAdjExecutedResponse;
 
 const DEFAULT_STATE: State = {
   apply_cpu_offset: true,
@@ -51,21 +67,16 @@ const RyzenadjResult: VFC<{ result: ServerResponse<any> | undefined }> = ({ resu
   return null;
 };
 
-const RyzenAdjDebug: VFC<{ result: ServerResponse<DebugResponse> | undefined }> = ({ result }) => {
-  if (result === undefined)
-    return <PanelSectionRow>Result currently undefined</PanelSectionRow>
-  if (!result.success)
-    return <PanelSectionRow>Result unsuccessful -- see above</PanelSectionRow>
-  if (result.success) {
-    return (
-      <PanelSectionRow>
-        <p>cmd: {result.result.ryzenadj_cmd}</p>
-        <p>stdout: {result.result.ryzenadj_stdout}</p>
-        <p>stderr: {result.result.ryzenadj_stderr}</p>
-      </PanelSectionRow>
-    )
-  }
-  return null
+const RyzenAdjDebug: VFC<{ details: RyzenAdjDetailsResponse | undefined }> = ({ details }) => {
+  if (details === undefined)
+    return <PanelSectionRow>RyzenAdj has not been executed yet</PanelSectionRow>
+  return (
+    <PanelSectionRow>
+      <p>cmd: {details.ryzenadj_cmd}</p>
+      <p>stdout: {details.ryzenadj_stdout}</p>
+      <p>stderr: {details.ryzenadj_stderr}</p>
+    </PanelSectionRow>
+  )
 };
 
 type DelayedProps = {
@@ -87,16 +98,9 @@ const Delayed: VFC<DelayedProps> = ({ children, delayMs }) => {
   return show ? <div>{children}</div> : null;
 };
 
-type State = {
-  apply_cpu_offset: boolean;
-  cpu_offset: number;
-  apply_gpu_offset: boolean;
-  gpu_offset: number;
-  show_debug: boolean;
-}
-
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
   const [state, setState] = useState<State | undefined>(undefined);
+  const [ryzenadjDetails, setRyzenadjDetails] = useState<RyzenAdjDetailsResponse | undefined>(undefined);
   const [result, setResult] = useState<ServerResponse<UpdateOffsetsResponse> | undefined>(undefined);
 
   useEffect(() => {
@@ -129,6 +133,12 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
         }
       );
       console.log("update_ryzenadj_config response:", response);
+
+      if (response.success) {
+        if (response.result.ryzenadj_executed) {
+          setRyzenadjDetails(response.result.ryzenadj_details)
+        }
+      }
       setResult(response);
     }
 
@@ -206,7 +216,7 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
               })
             }} />
         </PanelSectionRow>
-        {state.show_debug && <RyzenAdjDebug result={result} />}
+        {state.show_debug && <RyzenAdjDebug details={ryzenadjDetails} />}
         <PanelSectionRow>
           <ButtonItem
             layout="below"

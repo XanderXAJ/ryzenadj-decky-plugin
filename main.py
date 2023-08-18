@@ -119,29 +119,39 @@ class RyzenAdjConfigurer:
 
         return [f"{k}={v}" for k, v in flags.items()]
 
-    def apply_new_configuration(self, new_configuration: RyzenAdjConfiguration):
+    def apply_new_configuration(
+        self, new_configuration: RyzenAdjConfiguration
+    ) -> (bool, list[str], subprocess.CompletedProcess[str]):
         config_diff = self.active_configuration.compare_to_new(new_configuration)
         # TODO: Do nothing if no changes occurred
+        if len(config_diff) == 0:
+            return False, None, None
 
         decky_plugin.logger.info("config_diff: %s", config_diff)
         ra_flags = self.generate_delta_ra_flags(new_configuration, config_diff)
         result = self.__exec_ra(ra_flags)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = new_configuration
-        return result
+        return True, *result
 
-    def apply_force_configuration(self, configuration: RyzenAdjConfiguration):
+    def apply_force_configuration(
+        self, configuration: RyzenAdjConfiguration
+    ) -> (bool, list[str], subprocess.CompletedProcess[str]):
         ra_flags = self.generate_full_ra_flags(configuration)
         result = self.__exec_ra(ra_flags)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = configuration
-        return result
+        return True, *result
 
-    def reapply_configuration(self):
+    def reapply_configuration(
+        self,
+    ) -> (bool, list[str], subprocess.CompletedProcess[str]):
         decky_plugin.logger.info("Reapplying active configuration")
         return self.apply_force_configuration(self.active_configuration)
 
-    def __exec_ra(self, ra_flags: list[str]):
+    def __exec_ra(
+        self, ra_flags: list[str]
+    ) -> (list[str], subprocess.CompletedProcess[str]):
         decky_plugin.logger.info("ra_flags: %s", ra_flags)
         ra_cmd = [
             str(self.ra_path),
@@ -170,8 +180,18 @@ class Plugin:
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
     async def update_ryzenadj_config(self, config: dict):
         new_configuration = RyzenAdjConfiguration(**config)
-        ra_cmd, ra_result = self.rac.apply_new_configuration(new_configuration)
+        ra_executed, ra_cmd, ra_result = self.rac.apply_new_configuration(
+            new_configuration
+        )
         config = self.rac.active_configuration
+
+        ra_details = None
+        if ra_executed:
+            ra_details = {
+                "ryzenadj_cmd": " ".join(ra_cmd),
+                "ryzenadj_stderr": ra_result.stderr,
+                "ryzenadj_stdout": ra_result.stdout,
+            }
 
         response = {
             "apply_cpu_offset": config.apply_cpu_offset,
@@ -180,9 +200,8 @@ class Plugin:
             "apply_gpu_offset": config.apply_gpu_offset,
             "gpu_offset": config.gpu_offset,
             "gpu_value": config.gpu_value(),
-            "ryzenadj_cmd": " ".join(ra_cmd),
-            "ryzenadj_stderr": ra_result.stderr,
-            "ryzenadj_stdout": ra_result.stdout,
+            "ryzenadj_executed": ra_executed,
+            "ryzenadj_details": ra_details,
         }
         decky_plugin.logger.info("update_offsets response: %s", response)
         return response
