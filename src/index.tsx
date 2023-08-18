@@ -27,6 +27,7 @@ interface RyzenAdjDetailsResponse {
   ryzenadj_cmd: string;
   ryzenadj_stderr: string;
   ryzenadj_stdout: string;
+  timestamp: string;
 }
 interface RyzenAdjWasExecutedResponse {
   ryzenadj_executed: true;
@@ -72,6 +73,7 @@ const RyzenAdjDebug: VFC<{ details: RyzenAdjDetailsResponse | undefined }> = ({ 
     return <PanelSectionRow>RyzenAdj has not been executed yet</PanelSectionRow>
   return (
     <PanelSectionRow>
+      <p>Time: {details.timestamp}</p>
       <p>cmd: {details.ryzenadj_cmd}</p>
       <p>stdout: {details.ryzenadj_stdout}</p>
       <p>stderr: {details.ryzenadj_stderr}</p>

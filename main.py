@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 import subprocess
-from typing import ClassVar, Generic, TypeVar
+from typing import ClassVar, Generic, Tuple, TypeVar
 
 # The decky plugin module is located at decky-loader/plugin
 # For easy intellisense checkout the decky-loader code one directory up
@@ -69,6 +70,15 @@ class RyzenAdjConfiguration:
         return differences
 
 
+@dataclass
+class RyzenAdjResult:
+    cmd: list[str]
+    returncode: int
+    stdout: str
+    stderr: str
+    timestamp: datetime
+
+
 class RyzenAdjConfigurer:
     def __init__(self, ra_path: Path, initial_config: RyzenAdjConfiguration) -> None:
         # TODO: Accept previous successful configuration
@@ -121,37 +131,35 @@ class RyzenAdjConfigurer:
 
     def apply_new_configuration(
         self, new_configuration: RyzenAdjConfiguration
-    ) -> (bool, list[str], subprocess.CompletedProcess[str]):
+    ) -> Tuple[bool, RyzenAdjResult | None]:
         config_diff = self.active_configuration.compare_to_new(new_configuration)
         # TODO: Do nothing if no changes occurred
         if len(config_diff) == 0:
-            return False, None, None
+            return False, None
 
         decky_plugin.logger.info("config_diff: %s", config_diff)
         ra_flags = self.generate_delta_ra_flags(new_configuration, config_diff)
         result = self.__exec_ra(ra_flags)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = new_configuration
-        return True, *result
+        return True, result
 
     def apply_force_configuration(
         self, configuration: RyzenAdjConfiguration
-    ) -> (bool, list[str], subprocess.CompletedProcess[str]):
+    ) -> Tuple[bool, RyzenAdjResult]:
         ra_flags = self.generate_full_ra_flags(configuration)
         result = self.__exec_ra(ra_flags)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = configuration
-        return True, *result
+        return True, result
 
     def reapply_configuration(
         self,
-    ) -> (bool, list[str], subprocess.CompletedProcess[str]):
+    ) -> Tuple[bool, RyzenAdjResult]:
         decky_plugin.logger.info("Reapplying active configuration")
         return self.apply_force_configuration(self.active_configuration)
 
-    def __exec_ra(
-        self, ra_flags: list[str]
-    ) -> (list[str], subprocess.CompletedProcess[str]):
+    def __exec_ra(self, ra_flags: list[str]) -> RyzenAdjResult:
         decky_plugin.logger.info("ra_flags: %s", ra_flags)
         ra_cmd = [
             str(self.ra_path),
@@ -161,7 +169,13 @@ class RyzenAdjConfigurer:
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
         decky_plugin.logger.info("Applied configuration: %s", ra_result)
         # TODO: Check exit status and don't store new configuration in case of failure
-        return ra_cmd, ra_result
+        return RyzenAdjResult(
+            cmd=ra_cmd,
+            returncode=ra_result.returncode,
+            stderr=ra_result.stderr,
+            stdout=ra_result.stdout,
+            timestamp=datetime.today(),
+        )
 
 
 DEFAULT_RYZENADJ_CONFIG = RyzenAdjConfiguration(
@@ -180,26 +194,25 @@ class Plugin:
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
     async def update_ryzenadj_config(self, config: dict):
         new_configuration = RyzenAdjConfiguration(**config)
-        ra_executed, ra_cmd, ra_result = self.rac.apply_new_configuration(
-            new_configuration
-        )
-        config = self.rac.active_configuration
+        ra_executed, ra_result = self.rac.apply_new_configuration(new_configuration)
+        ra_config = self.rac.active_configuration
 
         ra_details = None
         if ra_executed:
             ra_details = {
-                "ryzenadj_cmd": " ".join(ra_cmd),
+                "ryzenadj_cmd": " ".join(ra_result.cmd),
                 "ryzenadj_stderr": ra_result.stderr,
                 "ryzenadj_stdout": ra_result.stdout,
+                "timestamp": ra_result.timestamp.isoformat(timespec="milliseconds"),
             }
 
         response = {
-            "apply_cpu_offset": config.apply_cpu_offset,
-            "cpu_offset": config.cpu_offset,
-            "cpu_value": config.cpu_value(),
-            "apply_gpu_offset": config.apply_gpu_offset,
-            "gpu_offset": config.gpu_offset,
-            "gpu_value": config.gpu_value(),
+            "apply_cpu_offset": ra_config.apply_cpu_offset,
+            "cpu_offset": ra_config.cpu_offset,
+            "cpu_value": ra_config.cpu_value(),
+            "apply_gpu_offset": ra_config.apply_gpu_offset,
+            "gpu_offset": ra_config.gpu_offset,
+            "gpu_value": ra_config.gpu_value(),
             "ryzenadj_executed": ra_executed,
             "ryzenadj_details": ra_details,
         }
