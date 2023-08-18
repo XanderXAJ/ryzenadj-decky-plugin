@@ -12,7 +12,7 @@ import {
   SteamSpinner,
   ToggleField,
 } from "decky-frontend-lib";
-import { useEffect, useState, VFC, StrictMode } from "react";
+import { useEffect, useState, VFC, StrictMode, Fragment } from "react";
 import { FaBolt } from "react-icons/fa6";
 
 type State = {
@@ -72,12 +72,12 @@ const RyzenAdjDebug: VFC<{ details: RyzenAdjDetailsResponse | undefined }> = ({ 
   if (details === undefined)
     return <PanelSectionRow>RyzenAdj has not been executed yet</PanelSectionRow>
   return (
-    <PanelSectionRow>
-      <p>Time: {details.timestamp}</p>
-      <p>cmd: {details.ryzenadj_cmd}</p>
-      <p>stdout: {details.ryzenadj_stdout}</p>
-      <p>stderr: {details.ryzenadj_stderr}</p>
-    </PanelSectionRow>
+    <Fragment>
+      <PanelSectionRow>Time: {details.timestamp}</PanelSectionRow>
+      <PanelSectionRow>cmd: {details.ryzenadj_cmd}</PanelSectionRow>
+      <PanelSectionRow>stdout: {details.ryzenadj_stdout}</PanelSectionRow>
+      <PanelSectionRow>stderr: {details.ryzenadj_stderr}</PanelSectionRow>
+    </Fragment>
   )
 };
 
