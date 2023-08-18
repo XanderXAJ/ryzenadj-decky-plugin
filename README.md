@@ -101,6 +101,15 @@ Note: _enter only the IP address_ -- don't be smart like me and also enter the p
 
 To find the plugin's components, since the core components of this plugin are prefixed with `RyzenAdj`, use the search bar to search for `RyzenAdj` and find them.
 
+### Debugging the Python Plugin Loader backend
+
+Plugin loader is the component that loads plugins (oddly enough).
+See its logs by running:
+
+```shell
+journalctl -u plugin_loader -b0
+```
+
 ### Dependencies
 
 As per other Decky Loader plugins, this plugin requires Node.js v16.14+ and `pnpm` (v8.5.1) installed.
