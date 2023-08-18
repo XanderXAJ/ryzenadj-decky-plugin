@@ -63,7 +63,7 @@ class RyzenAdjConfiguration:
                 old=self.apply_gpu_offset, new=new.apply_gpu_offset
             )
         if self.gpu_offset != new.gpu_offset:
-            differences["gpu_offset"] = ChangedValue[bool](
+            differences["gpu_offset"] = ChangedValue[int](
                 old=self.gpu_offset, new=new.gpu_offset
             )
 
