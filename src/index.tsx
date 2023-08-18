@@ -97,7 +97,7 @@ const Delayed: VFC<DelayedProps> = ({ children, delayMs }) => {
     return () => clearTimeout(wait);
   }, [delayMs]);
 
-  return show ? <div>{children}</div> : null;
+  return show ? <Fragment>{children}</Fragment> : null;
 };
 
 const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
