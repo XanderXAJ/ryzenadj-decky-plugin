@@ -34,8 +34,8 @@ class RyzenAdjConfiguration:
     def gpu_value(self) -> str:
         return hex(self.BASE_GPU + self.gpu_offset)
 
-    def compare_to_new(self, new: "RyzenAdjConfiguration") -> list[str]:
-        if self == new:
+    def compare_to_old(self, old: "RyzenAdjConfiguration") -> list[str]:
+        if self == old:
             return []
 
         fields_to_compare = [
@@ -45,9 +45,12 @@ class RyzenAdjConfiguration:
             "gpu_offset",
         ]
 
+        if old == None:
+            return fields_to_compare
+
         differences = []
         for field in fields_to_compare:
-            if getattr(self, field) != getattr(new, field):
+            if getattr(self, field) != getattr(old, field):
                 differences.append(field)
 
         return differences
@@ -117,7 +120,7 @@ class RyzenAdjConfigurer:
     def apply_new_configuration(
         self, new_configuration: RyzenAdjConfiguration
     ) -> Tuple[bool, RyzenAdjResult | None]:
-        config_diff = self.active_configuration.compare_to_new(new_configuration)
+        config_diff = new_configuration.compare_to_old(self.active_configuration)
         # Do nothing if no changes occurred
         if len(config_diff) == 0:
             return False, None
