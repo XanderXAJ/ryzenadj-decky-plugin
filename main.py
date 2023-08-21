@@ -10,15 +10,6 @@ from typing import ClassVar, Generic, Tuple, TypeVar
 import decky_plugin
 
 
-T = TypeVar("T")
-
-
-@dataclass
-class ChangedValue(Generic[T]):
-    old: T
-    new: T
-
-
 @dataclass
 class RyzenAdjConfiguration:
     apply_cpu_offset: bool
@@ -43,29 +34,21 @@ class RyzenAdjConfiguration:
     def gpu_value(self) -> str:
         return hex(self.BASE_GPU + self.gpu_offset)
 
-    def compare_to_new(self, new: "RyzenAdjConfiguration") -> dict[str, ChangedValue]:
+    def compare_to_new(self, new: "RyzenAdjConfiguration") -> list[str]:
         if self == new:
-            return {}
+            return []
 
-        differences = {}
+        fields_to_compare = [
+            "apply_cpu_offset",
+            "cpu_offset",
+            "apply_gpu_offset",
+            "gpu_offset",
+        ]
 
-        # I could probably do some metaprogramming here but I'm not sure that would be as clear...
-        if self.apply_cpu_offset != new.apply_cpu_offset:
-            differences["apply_cpu_offset"] = ChangedValue[int](
-                old=self.apply_cpu_offset, new=new.apply_cpu_offset
-            )
-        if self.cpu_offset != new.cpu_offset:
-            differences["cpu_offset"] = ChangedValue[int](
-                old=self.cpu_offset, new=new.cpu_offset
-            )
-        if self.apply_gpu_offset != new.apply_gpu_offset:
-            differences["apply_gpu_offset"] = ChangedValue[bool](
-                old=self.apply_gpu_offset, new=new.apply_gpu_offset
-            )
-        if self.gpu_offset != new.gpu_offset:
-            differences["gpu_offset"] = ChangedValue[int](
-                old=self.gpu_offset, new=new.gpu_offset
-            )
+        differences = []
+        for field in fields_to_compare:
+            if getattr(self, field) != getattr(new, field):
+                differences.append(field)
 
         return differences
 
@@ -99,7 +82,9 @@ class RyzenAdjConfigurer:
 
     @staticmethod
     def generate_delta_ra_flags(
-        new: RyzenAdjConfiguration, differences: dict[str, ChangedValue]
+        new: RyzenAdjConfiguration,
+        old: RyzenAdjConfiguration,
+        differences: list[str],
     ) -> list[str]:
         flags: dict[str, str] = {}
 
@@ -138,7 +123,9 @@ class RyzenAdjConfigurer:
             return False, None
 
         decky_plugin.logger.info("config_diff: %s", config_diff)
-        ra_flags = self.generate_delta_ra_flags(new_configuration, config_diff)
+        ra_flags = self.generate_delta_ra_flags(
+            new_configuration, self.active_configuration, config_diff
+        )
         result = self.__exec_ra(ra_flags)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = new_configuration
