@@ -118,7 +118,7 @@ class RyzenAdjConfigurer:
         self, new_configuration: RyzenAdjConfiguration
     ) -> Tuple[bool, RyzenAdjResult | None]:
         config_diff = self.active_configuration.compare_to_new(new_configuration)
-        # TODO: Do nothing if no changes occurred
+        # Do nothing if no changes occurred
         if len(config_diff) == 0:
             return False, None
 
@@ -126,6 +126,10 @@ class RyzenAdjConfigurer:
         ra_flags = self.generate_delta_ra_flags(
             new_configuration, self.active_configuration, config_diff
         )
+        # Do nothing if changes didn't result in any flags
+        if len(ra_flags) == 0:
+            return False, None
+
         result = self.__exec_ra(ra_flags)
         # TODO: Check exit status and don't store new configuration in case of failure
         self.active_configuration = new_configuration
