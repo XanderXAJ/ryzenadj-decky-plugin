@@ -205,6 +205,7 @@ class Plugin:
 
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
     async def update_ryzenadj_config(self, config: dict):
+        decky_plugin.logger.info("request: update_ryzenadj_config")
         new_configuration = RyzenAdjConfiguration(**config)
         ra_executed, ra_result = self.rac.apply_new_configuration(new_configuration)
         ra_config = self.rac.active_configuration
@@ -232,6 +233,7 @@ class Plugin:
         return response
 
     async def active_state(self):
+        decky_plugin.logger.info("request: active_state")
         config = self.rac.active_configuration
 
         return {
@@ -246,6 +248,7 @@ class Plugin:
         }
 
     async def on_resume_from_suspend(self):
+        decky_plugin.logger.info("request: on_resume_from_suspend")
         decky_plugin.logger.info("Resumed from sleep, reapplying configuration")
         self.rac.reapply_configuration()
 
