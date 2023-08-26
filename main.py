@@ -182,8 +182,6 @@ DEFAULT_RYZENADJ_CONFIG = RyzenAdjConfiguration(
 
 
 class LifecycleManager:
-    first_update: bool
-
     def __init__(self) -> None:
         self.first_update = True
 
