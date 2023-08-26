@@ -181,10 +181,28 @@ DEFAULT_RYZENADJ_CONFIG = RyzenAdjConfiguration(
 )
 
 
+class LifecycleManager:
+    first_update: bool
+
+    def __init__(self) -> None:
+        self.first_update = True
+
+    def first_update_done(self) -> bool:
+        current = self.first_update
+        self.first_update = False
+        return current
+
+    def system_crashed(self) -> bool:
+        return True
+
+
 # `self` doesn't work as expected in the Plugin class
 # as it is not properly inited by Decky Loader:
 #     https://github.com/SteamDeckHomebrew/decky-loader/issues/509
 class Plugin:
+    lm: LifecycleManager
+    rac: RyzenAdjConfigurer
+
     # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
     async def update_ryzenadj_config(self, config: dict):
         new_configuration = RyzenAdjConfiguration(**config)
@@ -217,11 +235,14 @@ class Plugin:
         config = self.rac.active_configuration
 
         return {
-            "apply_cpu_offset": config.apply_cpu_offset,
-            "cpu_offset": config.cpu_offset,
-            "apply_gpu_offset": config.apply_gpu_offset,
-            "gpu_offset": config.gpu_offset,
-            "show_debug": config.show_debug,
+            "first_update": self.lm.first_update_done(),
+            "state": {
+                "apply_cpu_offset": config.apply_cpu_offset,
+                "cpu_offset": config.cpu_offset,
+                "apply_gpu_offset": config.apply_gpu_offset,
+                "gpu_offset": config.gpu_offset,
+                "show_debug": config.show_debug,
+            },
         }
 
     async def on_resume_from_suspend(self):
@@ -231,6 +252,7 @@ class Plugin:
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
         decky_plugin.logger.info("Hello from RyzenAdj!")
+        self.lm = LifecycleManager()
         self.rac = RyzenAdjConfigurer(
             ra_path=Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj"),
             initial_config=DEFAULT_RYZENADJ_CONFIG,

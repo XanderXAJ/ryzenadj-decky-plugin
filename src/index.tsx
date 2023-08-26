@@ -23,6 +23,11 @@ type State = {
   show_debug: boolean;
 }
 
+type InitialStateResponse = {
+  first_update: boolean;
+  state: State;
+}
+
 interface RyzenAdjDetailsResponse {
   ryzenadj_cmd: string;
   ryzenadj_stderr: string;
@@ -110,13 +115,21 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
     if (state !== undefined) return;
 
     const initState = async () => {
-      const resp = await serverAPI.callPluginMethod<{}, State>(
+      const response = await serverAPI.callPluginMethod<{}, InitialStateResponse>(
         "active_state",
         {}
       );
-      console.log("active_state response:", resp);
-      if (resp.success) {
-        setState(resp.result);
+      console.log("active_state response:", response);
+      if (!response.success) return
+
+      setState(response.result.state);
+
+      if (response.result.first_update) {
+        serverAPI.toaster.toast({
+          title: "RyzenAdj",
+          body: "Welcome to RyzenAdj!",
+          icon: <FaBolt />,
+        });
       }
     }
 
@@ -136,12 +149,12 @@ const RyzenAdjContent: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
       );
       console.log("update_ryzenadj_config response:", response);
 
-      if (response.success) {
-        if (response.result.ryzenadj_executed) {
-          setRyzenadjDetails(response.result.ryzenadj_details)
-        }
-      }
       setResult(response);
+      if (!response.success) return;
+
+      if (response.result.ryzenadj_executed) {
+        setRyzenadjDetails(response.result.ryzenadj_details)
+      }
     }
 
     updateRyzenadjConfig();
