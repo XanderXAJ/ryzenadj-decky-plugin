@@ -7,7 +7,9 @@ This would be particularly useful for benchmarks to verify the effct of the tune
 
 ## Decision Drivers
 
-- Important
+- Easy to compare settings
+- Doesn't significantly complicate plugin usability
+- Doesn't significantly add development effort unless the benefit is worth it
 
 ## Considered Options
 
