@@ -65,3 +65,40 @@ For example, the proposed "Show GPU offset tuning" option would show or hide UI 
 However, if we say that the GPU offset was tuned to a non-default value and then the "Show GPU offset tuning" setting was turned off, it would perhaps be surprising to the user if the tune persisted.
 Therefore, to disable the tune would both affect the backend and, potentially, the RyzenAdj state.
 (Note: In this specific case, ignoring the GPU tuning options instead of resetting them in the RyzenAdj state would be my preferred the more expected way to go as the setting conceptually changes the _view_ of the tuning options, not the tuning options themselves.)
+
+#### Types of options
+
+It's worth considering that there may be whole classes or types of options.
+
+RyzenAdj settings, for example, are a specific class of state that can be treated as an isolated unit.
+Each game/app might have its own RyzenAdj settings. Pseudo config:
+
+```toml
+[tune.default]
+apply_cpu_offset = true
+cpu_offset = -5
+
+[tune.app."Ratchet & Clank: Rift Apart"]
+apply_cpu_offset = true
+cpu_offset = -10
+```
+
+Notifications and pop-ups/modal could also be their own type of options. For example:
+
+```toml
+[notification]
+show_notifications = true
+show_system_crash = true
+show_app_settings_change = false
+
+[modal]
+never_show_again_first_start = true
+never_show_again_gpu_warning = false
+```
+
+ Side note: Alternative modal design which allows for easy resets:
+
+ ```toml
+ [modal]
+ never_show_again = [ "first_start", "gpu_warning" ]
+ ```
