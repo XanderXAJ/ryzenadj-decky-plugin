@@ -4,19 +4,25 @@
 
 The plugin has a number of different types of state to store and keep track of, each with their own lifetime:
 
-- RyzenAdj State (e.g. `cpu_offset`, `apply_cpu_offset`)
-    - Lifetime: Ephemeral, planned to be permanent
-- UI state (e.g. first load, waiting for response)
+- UI state (e.g. first load, waiting for response, details of previous RyzenAdj execution)
     - Lifetime: Ephemeral, derived from other parts of state
+    - Persistence: Not persisted
+- RyzenAdj State (e.g. `cpu_offset`, `apply_cpu_offset`)
+    - Lifetime: Ephemeral, until the next confdig is applied
+    - Persistence: Not persisted, planned to be persisted
 - UI options not directly related to RyzenAdj state (e.g. show debug information, show GPU offset tuning)
-    - Lifetime: Persisted
+    - Lifetime: As long as the UI is visible
+    - Persistence: Persisted
 - Plugin options (e.g. restore settings on reboot)
-    - Lifetime: Persisted
+    - Lifetime: As long as the plugin is loaded
+    - Persistence: Persisted
 
-This decision will decide an initial policy how to categorise and store the different types of state.
+This decision will decide an initial high-level policy how to categorise and store the different types of state.
 This will include the shape of the state.
+The goal is to make it clear how to manage these states.
 
-
+This decision is not deciding by what mechanism to persist or serialise state, although pseudo-configuration may be used to help visualise the state.
+Additionally, how easy it is to do these things will be a decision driver.
 
 ## Decision Drivers
 
@@ -25,6 +31,7 @@ This will include the shape of the state.
     - Ease of transmission from backend to frontend
     - Ease of handling in frontend
 - Ease of understanding
+- Easy to serialise
 
 ## Considered Options
 
