@@ -29,7 +29,7 @@ Additionally, how easy it is to do these things will be a decision driver.
 - Ease of maintenance, including:
     - Ease of persisting settings in backend
     - Ease of transmission from backend to frontend
-    - Ease of handling in frontend
+    - Ease of storage, usage and updates in frontend
 - Ease of understanding
 - Easy to serialise
 
