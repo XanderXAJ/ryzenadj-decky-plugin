@@ -37,20 +37,80 @@ Additionally, how easy it is to do these things will be a decision driver.
 
 - Keep completely flat state
 - Separate RyzenAdj state and options state
+- Many separate types of configuration state
 
 ## Decision Outcome
 
-TODO
-Explain which outcome(s) were chosen.
+"Many separate types of configuration state" seems like the option that will allow for the most encapsulated and extensible code.
 
 ## Pro and Cons of the Options
 
-### Title of an option
+### Keep completely flat state
 
-TODO
-- Good, when it is good
-- Neutral, when it is neither good nor bad
-- Bad, when it is bad
+This conceptually means keeping everything at the same level. No nesting. No separation of the different types of state.
+
+For example:
+
+```yaml
+apply_cpu_offset: true
+cpu_offset: -10
+show_debug_information: true
+seen_launch_warning: false
+```
+
+- Good, straightforward to understand
+- Bad, difficult to handle as there's no opportunity for encapsulation or classification of different types of options
+    - For example, handling multiple RyzenAdj profiles across different games sounds arduous
+- Bad, as a lot of code will need to be written to handle every option -- and it'll all be combined together
+    - During development, parts of the code would naturally lend itself to being separated for maintainability... Suggesting this config should be the same.
+
+### Separate RyzenAdj state and options state
+
+Since tune profiles and plugin options are often used in different contexts, they could be treated and stored separately:
+
+```toml
+[tune]
+apply_cpu_offset = true
+cpu_offset = -10
+
+[options]
+show_debug_information = true
+seen_launch_warning = false
+```
+
+- Good, this allows for the storage of multiple tune profiles reasonably easily
+- Bad, for plugin options, this is perhaps still too rigid -- some configuration options can be grouped together
+
+### Many separate types of configuration state
+
+As discussed in _Types of Options_ below, there can be multiple different classifications of options within the plugin.
+These can be kept within their own domains.
+
+```toml
+[tune]
+apply_cpu_offset = true
+cpu_offset = -10
+
+[ui]
+show_debug_information = true
+
+[notification]
+show_notifications = true
+show_system_crash = true
+show_app_settings_change = false
+
+[modal]
+never_show_again = [ "first_start", "gpu_warning" ]
+```
+
+For example, handling modal and notification configuration separately could allow for abstracting them into separate components, e.g. `ModalManager` and `NotificationManager` on the frontend and backend, allowing for encapsulated and simplified code.
+
+There might still be room for a generic "options" section if no more-specific section fits.
+
+- Good, as it allows for encapsulation
+- Good, as it allows for storing multiple tune profiles easily
+- Good, as the configuration is reasonably easy to understand and edit by hand
+- Neutral, the most complex configuration to parse. However, the most complex part will likely be handled by a library.
 
 ## More Information
 
