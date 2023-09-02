@@ -117,7 +117,7 @@ class RyzenAdjConfigurer:
 
         return [f"{k}={v}" for k, v in flags.items()]
 
-    def apply_new_configuration(
+    def apply_configuration_delta(
         self, new_configuration: RyzenAdjConfiguration
     ) -> Tuple[bool, RyzenAdjResult | None]:
         config_diff = new_configuration.compare_to_old(self.active_configuration)
@@ -138,7 +138,7 @@ class RyzenAdjConfigurer:
         self.active_configuration = new_configuration
         return True, result
 
-    def apply_force_configuration(
+    def apply_configuration_full(
         self, configuration: RyzenAdjConfiguration
     ) -> Tuple[bool, RyzenAdjResult]:
         ra_flags = self.generate_full_ra_flags(configuration)
@@ -151,7 +151,7 @@ class RyzenAdjConfigurer:
         self,
     ) -> Tuple[bool, RyzenAdjResult]:
         decky_plugin.logger.info("Reapplying active configuration")
-        return self.apply_force_configuration(self.active_configuration)
+        return self.apply_configuration_full(self.active_configuration)
 
     def __exec_ra(self, ra_flags: list[str]) -> RyzenAdjResult:
         decky_plugin.logger.info("ra_flags: %s", ra_flags)
@@ -205,7 +205,7 @@ class Plugin:
     async def update_ryzenadj_config(self, config: dict):
         decky_plugin.logger.info("request: update_ryzenadj_config")
         new_configuration = RyzenAdjConfiguration(**config)
-        ra_executed, ra_result = self.rac.apply_new_configuration(new_configuration)
+        ra_executed, ra_result = self.rac.apply_configuration_delta(new_configuration)
         ra_config = self.rac.active_configuration
 
         ra_details = None
@@ -258,7 +258,7 @@ class Plugin:
             ra_path=Path(decky_plugin.DECKY_PLUGIN_DIR, "bin", "ryzenadj"),
             initial_config=DEFAULT_RYZENADJ_CONFIG,
         )
-        self.rac.apply_force_configuration(DEFAULT_RYZENADJ_CONFIG)
+        self.rac.apply_configuration_full(DEFAULT_RYZENADJ_CONFIG)
 
     # Function called first during the unload process, utilize this to handle your plugin being removed
     async def _unload(self):
