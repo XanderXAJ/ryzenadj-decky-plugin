@@ -162,7 +162,6 @@ class RyzenAdjConfigurer:
         decky_plugin.logger.info("ra_cmd: %s", ra_cmd)
         ra_result = subprocess.run(ra_cmd, capture_output=True, text=True)
         decky_plugin.logger.info("Applied configuration: %s", ra_result)
-        # TODO: Check exit status and don't store new configuration in case of failure
         return RyzenAdjResult(
             cmd=ra_cmd,
             returncode=ra_result.returncode,
