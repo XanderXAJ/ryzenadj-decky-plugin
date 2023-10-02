@@ -134,8 +134,9 @@ class RyzenAdjConfigurer:
             return False, None
 
         result = self.__exec_ra(ra_flags)
-        # TODO: Check exit status and don't store new configuration in case of failure
-        self.active_configuration = new_configuration
+        # Check exit status and don't store new configuration in case of failure
+        if result.returncode == 0:
+            self.active_configuration = new_configuration
         return True, result
 
     def apply_configuration_full(
@@ -143,8 +144,9 @@ class RyzenAdjConfigurer:
     ) -> Tuple[bool, RyzenAdjResult]:
         ra_flags = self.generate_full_ra_flags(configuration)
         result = self.__exec_ra(ra_flags)
-        # TODO: Check exit status and don't store new configuration in case of failure
-        self.active_configuration = configuration
+        # Check exit status and don't store new configuration in case of failure
+        if result.returncode == 0:
+            self.active_configuration = configuration
         return True, result
 
     def reapply_configuration(
