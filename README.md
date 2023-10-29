@@ -30,6 +30,30 @@ See the [LICENSE](/LICENSE) for the full terms.
 [decky-plugin-database]: https://github.com/SteamDeckHomebrew/decky-plugin-database
 [decky-plugin-template]: https://github.com/SteamDeckHomebrew/decky-plugin-template
 
+### Building and testing the plugin
+
+This plugin uses scripts supplied by the [decky-plugin-template], which target the VSCode family of editors.
+
+Go through the following every time you make a change:
+
+1. Update [`/.vscode/settings.json`](/.vscode/settings.json) file to match your Deck, including the Deck's current IP in `deckip` and your Deck's `sudo` password in `deckpass`.
+2. In VSCode, run the `Tasks: Run Build Task` action.
+   Under the hood, this runs the `builddeploy` task to both build and deploy the plugin to Deck.
+3. Enter your _local_ sudo password (not the Deck's!) when the build task prompts.
+
+#### Other important information
+
+If you are receiving build errors due to an out of date library, you should run this command inside of your repository:
+
+```bash
+pnpm update decky-frontend-lib --latest
+```
+
+### Backend build
+
+This plugin builds [RyzenAdj] from source as it does not provide pre-built binaries.
+See the [`/backend`](/backend/) directory for more details.
+
 ### Enable live reloading of plugins
 
 Decky Loader can live reload plugins but the functionality is disabled by default.
@@ -125,30 +149,6 @@ sudo npm i -g pnpm@8.5.1
 ```
 
 If you would like to build plugins that have their own custom backends, Docker is required as it is used by the Decky CLI tool.
-
-### Building and testing the plugin
-
-This plugin uses scripts supplied by the [decky-plugin-template], which target the VSCode family of editors.
-
-Go through the following every time you make a change:
-
-1. Update [`/.vscode/settings.json`](/.vscode/settings.json) file to match your Deck, including the Deck's current IP in `deckip` and your Deck's `sudo` password in `deckpass`.
-2. In VSCode, run the `Tasks: Run Build Task` action.
-   Under the hood, this runs the `builddeploy` task to both build and deploy the plugin to Deck.
-3. Enter your _local_ sudo password (not the Deck's!) when the build task prompts.
-
-#### Other important information
-
-If you are receiving build errors due to an out of date library, you should run this command inside of your repository:
-
-```bash
-pnpm update decky-frontend-lib --latest
-```
-
-### Backend build
-
-This plugin builds [RyzenAdj] from source as it does not provide pre-built binaries.
-See the [`/backend`](/backend/) directory for more details.
 
 ## Special Thanks
 
