@@ -32,14 +32,29 @@ See the [LICENSE](/LICENSE) for the full terms.
 
 ### Building and testing the plugin
 
-This plugin uses scripts supplied by the [decky-plugin-template], which target the VSCode family of editors.
+This plugin uses scripts modified from the [decky-plugin-template], which target the VSCode family of editors.
+
+#### Initial setup
+
+The supplied VSCode family build tasks require initial configuration:
+
+1. Copy [`/.vscode/defsettings.json`](/.vscode/defsettings.json) to [`/.vscode/settings.json`](/.vscode/settings.json).
+2. Update the new [`/.vscode/settings.json`](/.vscode/settings.json) file to match your Deck, including the Deck's current IP in `deckip` and your Deck's `sudo` password in `deckpass`.
+    - Alternatively, create a `deck` entry in your `~/.ssh/config` and set your `deckip` to `deck`.
+        This means you can both run the deploy tasks and SSH directly to the Deck while only have one location to update.
+        ```
+        Host deck
+            HostName 0.0.0.0
+        ```
+
+
+#### Deploying a change
 
 Go through the following every time you make a change:
 
-1. Update [`/.vscode/settings.json`](/.vscode/settings.json) file to match your Deck, including the Deck's current IP in `deckip` and your Deck's `sudo` password in `deckpass`.
-2. In VSCode, run the `Tasks: Run Build Task` action.
+1. In VSCode, run the `Tasks: Run Build Task` action.
    Under the hood, this runs the `builddeploy` task to both build and deploy the plugin to Deck.
-3. Enter your _local_ sudo password (not the Deck's!) when the build task prompts.
+2. Observe the output pane for any errors.
 
 #### Other important information
 
