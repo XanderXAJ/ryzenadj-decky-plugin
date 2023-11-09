@@ -1,10 +1,10 @@
 {
-    "deckip"    : "0.0.0.0",
-    "deckport"  : "22",
-    "deckuser"  : "deck",
-    "deckpass"  : "ssap",
+    "deckip": "0.0.0.0",
+    "deckport": "22",
+    "deckuser": "deck",
+    "deckpass": "ssap",
     "deckkey": "",
-    "deckdir"   : "/home/deck",
+    "deckdir": "/home/deck",
     "pluginname": "RyzenAdj",
     "python.analysis.extraPaths": [
         "./py_modules"
