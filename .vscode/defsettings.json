@@ -5,7 +5,7 @@
     "deckpass"  : "ssap",
     "deckkey": "",
     "deckdir"   : "/home/deck",
-    "pluginname": "Example Plugin",
+    "pluginname": "RyzenAdj",
     "python.analysis.extraPaths": [
         "./py_modules"
     ],
