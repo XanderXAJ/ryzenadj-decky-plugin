@@ -8,5 +8,10 @@
     "pluginname": "Example Plugin",
     "python.analysis.extraPaths": [
         "./py_modules"
-    ]
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "python.formatting.provider": "none"
 }
