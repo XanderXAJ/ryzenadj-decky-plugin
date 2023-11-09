@@ -34,6 +34,8 @@ See the [LICENSE](/LICENSE) for the full terms.
 
 This plugin uses scripts modified from the [decky-plugin-template], which target the VSCode family of editors.
 
+To see the available tasks, run the `Tasks: Run Task` action, or open [`/.vscode/tasks.json`](/.vscode/tasks.json).
+
 #### Initial setup
 
 The supplied VSCode family build tasks require initial configuration:
