@@ -38,10 +38,32 @@ To see the available tasks, run the `Tasks: Run Task` action, or open [`/.vscode
 
 #### Initial setup
 
+Since SSH is used to deploy the plugin, your Steam Deck also requires initial configuration:
+
+1. Set a user password by running:
+
+   ```shell
+   passwd
+   ```
+
+   Follow the prompts and remember the password.
+
+2. Enable the SSH daemon to allow logins over SSH:
+
+   ```shell
+   sudo systemctl enable sshd.service
+   sudo systemctl start sshd.service
+   ```
+
+3. SSH is now enabled and running.
+   If you're unsure how to SSH to the Deck, [follow these instructions][deck-ssh].
+
+If SSH is not working at this point, [see these additional instructions][deck-ssh].
+
 The supplied VSCode family build tasks require initial configuration:
 
 1. Copy [`/.vscode/defsettings.json`](/.vscode/defsettings.json) to [`/.vscode/settings.json`](/.vscode/settings.json).
-2. Update the new [`/.vscode/settings.json`](/.vscode/settings.json) file to match your Deck, including the Deck's current IP in `deckip` and your Deck's `sudo` password in `deckpass`.
+2. Update the new [`/.vscode/settings.json`](/.vscode/settings.json) file to match your Deck, including the Deck's current IP in `deckip` and your Deck's user password (the one you use with `sudo`, not your Steam account) in `deckpass`.
     - Alternatively, create a `deck` entry in your `~/.ssh/config` and set your `deckip` to `deck`.
         This means you can both run the deploy tasks and SSH directly to the Deck while only have one location to update.
         ```
@@ -49,6 +71,7 @@ The supplied VSCode family build tasks require initial configuration:
             HostName 0.0.0.0
         ```
 
+[deck-ssh]: https://gist.github.com/andygeorge/eee2825fa6446b629745ea92e862593a
 
 #### Deploying a change
 
