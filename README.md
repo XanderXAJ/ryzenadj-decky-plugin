@@ -1,5 +1,3 @@
-
-
 # RyzenAdj Decky Plugin
 
 [Decky Loader][decky-loader] plugin to use [RyzenAdj] to tune how your Steam Deck runs in Game Mode.
