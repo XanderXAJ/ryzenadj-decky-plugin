@@ -92,6 +92,7 @@ pnpm update decky-frontend-lib --latest
 ### Backend build
 
 This plugin builds [RyzenAdj] from source as it does not provide pre-built binaries.
+The backend expects the `ryzenadj` executable to be available at `bin/ryzenadj` inside the plugin directory.
 See the [`/backend`](/backend/) directory for more details.
 
 ### Enable live reloading of plugins
